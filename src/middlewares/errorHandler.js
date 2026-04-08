@@ -1,0 +1,12 @@
+function notFound(req, res, next) {
+  res.status(404).json({ error: 'Ruta no encontrada' });
+}
+
+function errorHandler(err, req, res, next) {
+  const status = err.statusCode || 500;
+  const message = err.message || 'Error interno del servidor';
+  console.error(err);
+  res.status(status).json({ error: message });
+}
+
+module.exports = { notFound, errorHandler };

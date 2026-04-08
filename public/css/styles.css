@@ -1,0 +1,61 @@
+:root {
+  --bg: #f2f5f9;
+  --card: #ffffff;
+  --accent: #0f766e;
+  --accent-2: #155e75;
+  --text: #1f2937;
+}
+
+body {
+  background: radial-gradient(circle at top right, #dbeafe, transparent 45%), var(--bg);
+  color: var(--text);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  min-height: 100vh;
+}
+
+.navbar {
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+}
+
+.brand-strong {
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+.card {
+  border: none;
+  border-radius: 14px;
+  box-shadow: 0 10px 25px rgba(31, 41, 55, 0.08);
+}
+
+.hero {
+  background: linear-gradient(120deg, #e0f2fe, #ecfeff);
+  border-radius: 18px;
+  padding: 2rem;
+}
+
+.section-title {
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+footer {
+  margin-top: 3rem;
+  background: #0f172a;
+  color: #e2e8f0;
+  padding: 1.4rem 0;
+}
+
+.footer-map a {
+  color: #93c5fd;
+  text-decoration: none;
+  margin-right: 1rem;
+}
+
+.footer-map a:hover {
+  text-decoration: underline;
+}
+
+.hidden {
+  display: none;
+}
