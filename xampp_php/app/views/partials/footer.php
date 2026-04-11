@@ -7,7 +7,8 @@
     </div>
     <div class="d-flex flex-wrap gap-3 small">
       <a href="<?php echo BASE_URL; ?>/index.php?page=home">Home</a>
-      <a href="<?php echo BASE_URL; ?>/index.php?page=login">Login/Registro</a>
+      <a href="<?php echo BASE_URL; ?>/index.php?page=login">Login</a>
+      <a href="<?php echo BASE_URL; ?>/index.php?page=register">Registrarse</a>
       <a href="<?php echo BASE_URL; ?>/index.php?page=profile">Perfil</a>
       <a href="<?php echo BASE_URL; ?>/index.php?page=flights">Vuelos</a>
       <a href="<?php echo BASE_URL; ?>/index.php?page=reservations">Reservas</a>

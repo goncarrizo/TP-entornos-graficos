@@ -42,4 +42,37 @@ class User
         $row = $stmt->fetch();
         return (int) $row['c'];
     }
+
+    public static function findByEmailExcludingId(string $email, int $excludeId): ?array
+    {
+        $sql = 'SELECT id, name, email FROM users WHERE email = :email AND id <> :id LIMIT 1';
+        $stmt = Database::connection()->prepare($sql);
+        $stmt->execute(['email' => $email, 'id' => $excludeId]);
+        $row = $stmt->fetch();
+
+        return $row ?: null;
+    }
+
+    public static function updateProfile(int $id, string $name, string $email): bool
+    {
+        $sql = 'UPDATE users SET name = :name, email = :email WHERE id = :id';
+        $stmt = Database::connection()->prepare($sql);
+
+        return $stmt->execute([
+            'id' => $id,
+            'name' => $name,
+            'email' => $email,
+        ]);
+    }
+
+    public static function updatePassword(int $id, string $passwordHash): bool
+    {
+        $sql = 'UPDATE users SET password_hash = :password_hash WHERE id = :id';
+        $stmt = Database::connection()->prepare($sql);
+
+        return $stmt->execute([
+            'id' => $id,
+            'password_hash' => $passwordHash,
+        ]);
+    }
 }

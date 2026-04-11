@@ -5,24 +5,36 @@ class AuthController
     public static function register(): void
     {
         $name = clean_text($_POST['name'] ?? '');
+        $lastname = clean_text($_POST['lastname'] ?? '');
         $email = clean_email($_POST['email'] ?? '');
+        $phone = preg_replace('/\s+/', '', (string) ($_POST['phone'] ?? ''));
+        $document = preg_replace('/\D+/', '', (string) ($_POST['document'] ?? ''));
+        $birthdate = (string) ($_POST['birthdate'] ?? '');
         $password = (string) ($_POST['password'] ?? '');
+        $passwordConfirm = (string) ($_POST['password_confirm'] ?? '');
 
-        if ($name === '' || !valid_email($email) || strlen($password) < 6) {
+        $fullName = trim($name . ' ' . $lastname);
+
+        $validPhone = (bool) preg_match('/^[0-9+\-]{8,20}$/', $phone);
+        $validDocument = (bool) preg_match('/^[0-9]{7,10}$/', $document);
+        $validBirthdate = (bool) preg_match('/^\d{4}-\d{2}-\d{2}$/', $birthdate);
+        $passwordsMatch = $password !== '' && $password === $passwordConfirm;
+
+        if ($fullName === '' || !valid_email($email) || strlen($password) < 6 || !$passwordsMatch || !$validPhone || !$validDocument || !$validBirthdate) {
             flash('error', 'Datos invalidos en registro.');
-            redirect_to('login');
+            redirect_to('register');
         }
 
         if (User::findByEmail($email)) {
             flash('error', 'El email ya existe.');
-            redirect_to('login');
+            redirect_to('register');
         }
 
         // MD5: hash de una sola via (irreversible en forma directa).
         // Se usa aqui por requerimiento academico, aunque hoy no se recomienda en produccion.
         $hash = md5($password);
-        User::create($name, $email, $hash);
-        send_app_mail($email, 'Registro AirARG', "Hola $name, tu cuenta fue creada correctamente.");
+        User::create($fullName, $email, $hash);
+        send_app_mail($email, 'Registro AirARG', "Hola $fullName, tu cuenta fue creada correctamente.");
         flash('ok', 'Registro exitoso. Ya podes iniciar sesion.');
         redirect_to('login');
     }
@@ -76,5 +88,70 @@ class AuthController
         session_start();
         flash('ok', 'Sesion cerrada correctamente.');
         redirect_to('home');
+    }
+
+    public static function updateProfile(): void
+    {
+        require_login();
+
+        $user = current_user();
+        $userId = (int) ($user['id'] ?? 0);
+
+        $name = clean_text($_POST['name'] ?? '');
+        $email = clean_email($_POST['email'] ?? '');
+
+        if ($name === '' || !valid_email($email)) {
+            flash('error', 'Datos invalidos para actualizar tu cuenta.');
+            redirect_to('profile');
+        }
+
+        $emailTaken = User::findByEmailExcludingId($email, $userId);
+        if ($emailTaken) {
+            flash('error', 'Ese email ya esta en uso por otra cuenta.');
+            redirect_to('profile');
+        }
+
+        User::updateProfile($userId, $name, $email);
+
+        $_SESSION['user']['name'] = $name;
+        $_SESSION['user']['nombre'] = $name;
+        $_SESSION['user']['email'] = $email;
+        $_SESSION['nombre'] = $name;
+
+        flash('ok', 'Tu cuenta fue actualizada correctamente.');
+        redirect_to('profile');
+    }
+
+    public static function changePassword(): void
+    {
+        require_login();
+
+        $user = current_user();
+        $userId = (int) ($user['id'] ?? 0);
+        $email = (string) ($user['email'] ?? '');
+
+        $currentPassword = (string) ($_POST['current_password'] ?? '');
+        $newPassword = (string) ($_POST['new_password'] ?? '');
+        $confirmPassword = (string) ($_POST['confirm_password'] ?? '');
+
+        if (strlen($currentPassword) < 6 || strlen($newPassword) < 6 || $newPassword !== $confirmPassword) {
+            flash('error', 'Revisa los datos de cambio de clave.');
+            redirect_to('profile');
+        }
+
+        $dbUser = User::findByEmail($email);
+        if (!$dbUser || md5($currentPassword) !== $dbUser['password_hash']) {
+            flash('error', 'La clave actual no es correcta.');
+            redirect_to('profile');
+        }
+
+        if ($currentPassword === $newPassword) {
+            flash('error', 'La nueva clave debe ser diferente a la actual.');
+            redirect_to('profile');
+        }
+
+        User::updatePassword($userId, md5($newPassword));
+        flash('ok', 'Clave actualizada correctamente.');
+        redirect_to('profile');
     }
 }

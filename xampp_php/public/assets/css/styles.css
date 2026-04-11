@@ -7,12 +7,24 @@
   --surface: #ffffff;
 }
 
+html,
 body {
+  height: 100%;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
   min-height: 100vh;
   color: var(--text);
   background:
     radial-gradient(circle at 8% 0%, rgba(11, 61, 145, 0.16), transparent 34%),
     linear-gradient(180deg, #f8fbff 0%, var(--bg) 60%, #e7eef8 100%);
+}
+
+main {
+  flex: 1 0 auto;
+  width: 100%;
 }
 
 .app-navbar {
@@ -134,6 +146,7 @@ body {
 }
 
 .site-footer {
+  margin-top: auto;
   border-top: 1px solid #d5e0ee;
   background: #f8fbff;
   color: #3b5576;
@@ -154,6 +167,102 @@ body {
   background: #f2f7ff;
 }
 
+.account-dropdown .account-toggle {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.9rem;
+  border-radius: 999px;
+  min-width: 210px;
+  box-shadow: 0 8px 18px rgba(11, 37, 74, 0.08);
+}
+
+.account-dropdown .account-toggle::after {
+  margin-left: auto;
+  margin-right: 0;
+  margin-top: 0;
+}
+
+.account-avatar {
+  width: 2.2rem;
+  height: 2.2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: #ffffff;
+  background: linear-gradient(135deg, #123f92, #0c63de);
+  box-shadow:
+    0 8px 18px rgba(11, 61, 145, 0.22),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.18);
+  flex: 0 0 auto;
+}
+
+.account-avatar-icon svg {
+  width: 1.18rem;
+  height: 1.18rem;
+  fill: #ffffff;
+  stroke: #ffffff;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.12));
+}
+
+.account-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+}
+
+.account-name {
+  font-weight: 800;
+  line-height: 1.05;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.account-role {
+  font-size: 0.73rem;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: #5b7596;
+}
+
+.dropdown-menu-animated {
+  border: 1px solid #d7e2ef;
+  border-radius: 16px;
+  padding: 0.5rem;
+  min-width: 240px;
+  transform-origin: top center;
+  animation: dropdownSlideDown 180ms ease-out;
+}
+
+.dropdown-menu-animated .dropdown-item {
+  border-radius: 10px;
+  padding: 0.58rem 0.8rem;
+}
+
+.dropdown-menu-animated .dropdown-item:hover,
+.dropdown-menu-animated .dropdown-item:focus {
+  background: #eef4ff;
+  color: #0b3d91;
+}
+
+@keyframes dropdownSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scaleY(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scaleY(1);
+  }
+}
+
 @media (max-width: 768px) {
   .hero {
     padding: 1.2rem !important;
@@ -162,6 +271,22 @@ body {
   .navbar .nav-link {
     padding-top: 0.35rem;
     padding-bottom: 0.35rem;
+  }
+
+  .account-dropdown .account-toggle {
+    min-width: 0;
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .account-avatar {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .account-avatar-icon svg {
+    width: 1rem;
+    height: 1rem;
   }
 
   .metric-value {

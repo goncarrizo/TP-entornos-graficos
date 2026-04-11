@@ -1,4 +1,6 @@
-<?php $user = current_user(); ?>
+<?php
+$user = current_user();
+?>
 <div class="brand-strip" aria-hidden="true"></div>
 <nav class="navbar navbar-expand-lg navbar-light app-navbar" aria-label="Barra principal de navegacion">
   <div class="container">
@@ -11,24 +13,41 @@
         <li class="nav-item"><a class="nav-link" href="<?php echo BASE_URL; ?>/index.php?page=home">Home</a></li>
         <li class="nav-item"><a class="nav-link" href="<?php echo BASE_URL; ?>/index.php?page=flights">Vuelos</a></li>
         <li class="nav-item"><a class="nav-link" href="<?php echo BASE_URL; ?>/index.php?page=news">Novedades</a></li>
-        <?php if ($user): ?>
-          <li class="nav-item"><a class="nav-link" href="<?php echo BASE_URL; ?>/index.php?page=profile">Perfil</a></li>
-          <li class="nav-item"><a class="nav-link" href="<?php echo BASE_URL; ?>/index.php?page=reservations">Reservas</a></li>
-        <?php endif; ?>
-        <?php if ($user && $user['role'] === 'admin'): ?>
-          <li class="nav-item"><a class="nav-link" href="<?php echo BASE_URL; ?>/index.php?page=admin">Panel Admin</a></li>
-        <?php endif; ?>
-        <?php if ($user && $user['role'] === 'ceo'): ?>
-          <li class="nav-item"><a class="nav-link" href="<?php echo BASE_URL; ?>/index.php?page=ceo">Panel CEO</a></li>
-        <?php endif; ?>
       </ul>
       <div class="d-flex gap-2 align-items-center">
         <?php if ($user): ?>
-          <span class="badge pill-user"><?php echo htmlspecialchars($user['name']); ?> (<?php echo htmlspecialchars($user['role']); ?>)</span>
-          <form method="post" action="<?php echo BASE_URL; ?>/index.php?page=home" class="m-0">
-            <input type="hidden" name="action" value="logout">
-            <button class="btn btn-sm btn-outline-primary" type="submit">Salir</button>
-          </form>
+          <div class="dropdown account-dropdown">
+            <button class="btn btn-light dropdown-toggle pill-user account-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <span class="account-avatar account-avatar-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" role="img" aria-hidden="true" focusable="false">
+                  <circle cx="12" cy="8" r="3.2"></circle>
+                  <path d="M4.5 19.2c0-4 3.4-6.7 7.5-6.7s7.5 2.7 7.5 6.7" fill="none"></path>
+                </svg>
+              </span>
+              <span class="account-copy">
+                <span class="account-name"><?php echo htmlspecialchars($user['name']); ?></span>
+                <span class="account-role"><?php echo htmlspecialchars($user['role']); ?></span>
+              </span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end dropdown-menu-animated shadow-sm">
+              <li><h6 class="dropdown-header">Cuenta</h6></li>
+              <li><a class="dropdown-item" href="<?php echo BASE_URL; ?>/index.php?page=profile">Gestionar cuenta</a></li>
+              <li><a class="dropdown-item" href="<?php echo BASE_URL; ?>/index.php?page=reservations">Mis reservas</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <?php if ($user['role'] === 'admin'): ?>
+                <li><a class="dropdown-item" href="<?php echo BASE_URL; ?>/index.php?page=admin">Panel Admin</a></li>
+              <?php endif; ?>
+              <?php if ($user['role'] === 'ceo'): ?>
+                <li><a class="dropdown-item" href="<?php echo BASE_URL; ?>/index.php?page=ceo">Panel CEO</a></li>
+              <?php endif; ?>
+              <li>
+                <form method="post" action="<?php echo BASE_URL; ?>/index.php?page=home" class="m-0">
+                  <input type="hidden" name="action" value="logout">
+                  <button class="dropdown-item text-danger" type="submit">Cerrar sesion</button>
+                </form>
+              </li>
+            </ul>
+          </div>
         <?php else: ?>
           <a class="btn btn-sm btn-primary" href="<?php echo BASE_URL; ?>/index.php?page=login">Ingresar</a>
         <?php endif; ?>

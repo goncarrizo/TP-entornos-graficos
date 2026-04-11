@@ -17,6 +17,12 @@ if ($action) {
             case 'logout':
                 AuthController::logout();
                 break;
+            case 'update_profile':
+                AuthController::updateProfile();
+                break;
+            case 'change_password':
+                AuthController::changePassword();
+                break;
             case 'reserve':
                 ReservationController::reserve();
                 break;
@@ -84,6 +90,9 @@ switch ($page) {
         break;
     case 'login':
         view('login');
+        break;
+    case 'register':
+        view('register');
         break;
     case 'profile':
         require_login();
