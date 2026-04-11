@@ -1,50 +1,67 @@
-# Trabajo Práctico Final - Entornos Gráficos
+# TP Entornos Graficos - Entrega UTN (Entornos Graficos)
 
-Sistema web académico de gestión de reservas de vuelos desarrollado para UTN FRRO.
+Este repositorio esta organizado exclusivamente para la entrega academica UTN con PHP + MySQL en XAMPP:
 
-La implementación principal para entrega y ejecución en XAMPP está en [xampp_php/README.md](xampp_php/README.md).
-
-## Resumen del proyecto
-
-El sistema modela una plataforma de aerolínea con los siguientes roles:
-
-- Administrador
-- CEO de aerolínea
-- Usuario registrado
-- Usuario no registrado
-
-## Alcance funcional
-
-- Búsqueda y visualización de vuelos y aerolíneas para visitantes.
-- Registro y autenticación de usuarios con sesión PHP.
-- Reserva y cancelación de vuelos con reglas de negocio.
-- Panel de administración para aerolíneas, novedades y promociones.
-- Panel de CEO para vuelos, promociones y reportes.
-- Paginación, validaciones, protección de rutas y envío de mails.
-
-## Tecnologías
-
-- PHP
-- MySQL
-- Bootstrap 5
+- HTML5
+- CSS3
+- Bootstrap
 - JavaScript
 - jQuery
+- PHP (sin framework)
+- MySQL
 - XAMPP
 
-## Documentación incluida
+La version oficial para presentar esta en [xampp_php](xampp_php).
 
-- [README del proyecto PHP/XAMPP](xampp_php/README.md)
-- [Informe final académico](xampp_php/INFORME_FINAL.md)
-- [Script SQL](xampp_php/sql/schema.sql)
+## Estructura para la entrega
 
-## Criterios destacados para evaluación
+- [xampp_php](xampp_php): implementacion MVC completa en PHP
+- [xampp_php/public/index.php](xampp_php/public/index.php): front controller y router
+- [xampp_php/app](xampp_php/app): controladores, modelos, helpers y vistas
+- [xampp_php/sql/schema.sql](xampp_php/sql/schema.sql): script SQL de la entrega
+- [GUIA_XAMPP_MYSQL_PASO_A_PASO.md](GUIA_XAMPP_MYSQL_PASO_A_PASO.md): guia operativa de XAMPP
+- [ENTREGA_UTN_XAMPP.md](ENTREGA_UTN_XAMPP.md): checklist de cumplimiento contra consigna
 
-- Separación por capas y código modular.
-- Uso de sesiones para autenticación y control de acceso.
-- CRUD completo con validaciones del lado cliente y servidor.
-- Manejo de errores y sanitización de entradas.
-- Diseño responsive y estructura accesible.
+## Version oficial (PHP + XAMPP)
 
-## Recomendación de entrega
+### Requisitos
 
-Para la defensa, conviene presentar primero el flujo general del sistema, luego mostrar el login, la protección por roles, el CRUD y las reglas de negocio principales.
+- Apache y MySQL levantados en XAMPP
+
+### Configuracion
+
+1. Copiar la carpeta PHP a htdocs
+
+```bash
+sudo cp -R /Users/joa/TP-entornos-graficos/xampp_php /Applications/XAMPP/xamppfiles/htdocs/
+```
+
+2. Cargar base de datos oficial
+
+```bash
+/Applications/XAMPP/xamppfiles/bin/mysql -h 127.0.0.1 -P 3306 -u root --password='' -e "CREATE DATABASE IF NOT EXISTS airarg_db;"
+/Applications/XAMPP/xamppfiles/bin/mysql -h 127.0.0.1 -P 3306 -u root --password='' airarg_db < xampp_php/sql/schema.sql
+```
+
+3. Verificar credenciales en [xampp_php/app/config/config.php](xampp_php/app/config/config.php)
+
+### Ejecucion
+
+- Home: http://localhost/xampp_php/public/index.php?page=home
+- Login: http://localhost/xampp_php/public/index.php?page=login
+
+## Usuarios de prueba
+
+- admin@tp.com / 123456
+- ceo@tp.com / 123456
+- cliente@tp.com / 123456
+
+## Alcance funcional implementado
+
+- Registro y login
+- Sesiones con `session_start()`, `$_SESSION`, `session_destroy()`
+- ABMC para entidades principales (segun rol)
+- Busqueda de vuelos y paginacion
+- Reserva y cancelacion de reservas
+- Panel Admin y panel CEO
+- Envio de mails (con fallback local)

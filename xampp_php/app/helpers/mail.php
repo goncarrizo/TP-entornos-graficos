@@ -5,7 +5,7 @@ function send_app_mail(string $to, string $subject, string $message): bool
     $headers = [
         'MIME-Version: 1.0',
         'Content-type: text/plain; charset=utf-8',
-        'From: no-reply@aeroutn.local',
+        'From: no-reply@airarg.local',
     ];
 
     $sent = @mail($to, $subject, $message, implode("\r\n", $headers));

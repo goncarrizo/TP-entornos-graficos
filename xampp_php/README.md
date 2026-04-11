@@ -1,152 +1,61 @@
-# TP Final Entornos Gráficos - Implementación PHP + MySQL para XAMPP
+# Versión PHP / XAMPP
 
-Proyecto académico orientado a la defensa oral y práctica en UTN FRRO.
+Esta carpeta contiene la implementación MVC del trabajo práctico pensada para ejecutarse con XAMPP.
 
-## 1. Objetivo del sistema
+## Estructura
 
-Desarrollar una plataforma de reservas de vuelos con distintos perfiles de usuario, aplicando buenas prácticas de desarrollo web, separación por capas, validación de datos y control de acceso por roles.
+- `public/index.php`: punto de entrada único y router de páginas y acciones.
+- `app/bootstrap.php`: carga configuración, helpers, modelos y controladores.
+- `app/config/config.php`: variables base, sesión y conexión a base de datos.
+- `app/controllers`: lógica de autenticación, vuelos, reservas, panel admin y panel CEO.
+- `app/models`: acceso a datos y consultas del dominio.
+- `app/helpers`: sesión, vistas, validación, mail y utilidades.
+- `app/views`: páginas HTML/PHP y parciales reutilizables.
+- `sql/schema.sql`: esquema completo y datos semilla.
+- `INFORME_FINAL.md`: documentación académica del proyecto.
 
-## 2. Tecnologías utilizadas
+## Funcionalidades
 
-- PHP 8+
-- MySQL
-- Bootstrap 5
-- JavaScript
-- jQuery
-- XAMPP
+- Registro y login con sesión PHP.
+- Perfil de usuario autenticado.
+- Búsqueda y paginación de vuelos.
+- Reserva y cancelación con validación de reglas de negocio.
+- Panel de administrador para aerolíneas, novedades y promociones.
+- Panel de CEO para vuelos, promociones y reportes.
+- Envío de mails en acciones clave como registro, reserva y cancelación.
 
-## 3. Estructura general
+## Reglas de negocio
 
-El proyecto sigue una organización tipo MVC:
+- La reserva descuenta asientos disponibles antes de confirmarse.
+- La cancelación sólo se permite con al menos 72 horas de anticipación.
+- Las promociones pueden aprobarse o denegarse desde el panel de administrador.
+- El acceso a pantallas y acciones está restringido por rol.
 
-- `app/`: lógica de negocio, controladores, modelos y vistas.
-- `public/`: punto de entrada web, CSS y JS públicos.
-- `sql/`: script de base de datos.
+## Base de datos
 
-## 4. Instalación en XAMPP
+El esquema se crea sobre la base `airarg_db` e incluye:
 
-1. Copiar la carpeta `xampp_php` dentro de `htdocs`.
-2. Iniciar Apache y MySQL desde XAMPP.
-3. Abrir phpMyAdmin y ejecutar `sql/schema.sql`.
-4. Verificar credenciales de base en `app/config/config.php`.
-5. Abrir la aplicación en navegador.
+- Usuarios con rol `admin`, `ceo` o `customer`.
+- Aerolíneas.
+- Vuelos.
+- Promociones con estado y activación.
+- Reservas.
+- Novedades.
 
-URL sugerida:
+Incluye datos demo para probar el sistema con usuarios de ejemplo y contenido inicial.
 
-- `http://localhost/TP-entornos-graficos/xampp_php/public/index.php?page=home`
+## Acceso rápido
 
-## 5. Usuarios de prueba
+Los usuarios de prueba son los mismos del resto del proyecto:
 
-- Administrador: `admin@tp.com` / `123456`
-- CEO: `ceo@tp.com` / `123456`
-- Cliente: `cliente@tp.com` / `123456`
+- `admin@tp.com` / `123456`
+- `ceo@tp.com` / `123456`
+- `cliente@tp.com` / `123456`
 
-## 6. Funcionalidades implementadas
+## Ejecución
 
-### Visitante no autenticado
-
-- Ver vuelos
-- Ver aerolíneas
-- Ver novedades
-
-### Usuario registrado
-
-- Registro con validación
-- Login y logout con sesiones
-- Búsqueda de vuelos
-- Reserva de vuelos
-- Cancelación con regla de 72 horas
-- Historial de reservas
-
-### CEO
-
-- ABMC de vuelos
-- ABMC de promociones
-- Reportes de ventas y ocupación
-
-### Administrador
-
-- ABMC de aerolíneas
-- Aprobación y denegación de promociones
-- ABMC de novedades
-- Reportes del sistema
-
-## 7. Manejo de sesiones
-
-El sistema usa `session_start()` al inicio de la configuración para mantener el estado de autenticación.
-
-Datos guardados en sesión:
-
-- `id_usuario`
-- `nombre`
-- `rol`
-
-La sesión se utiliza para proteger páginas privadas y para mostrar información contextual del usuario.
-
-Al cerrar sesión, el sistema limpia `$_SESSION` y ejecuta `session_destroy()`.
-
-### Sesiones vs cookies
-
-- Una cookie almacena datos en el navegador.
-- Una sesión guarda el estado en el servidor y solo expone un identificador al cliente.
-- Para autenticación, la sesión es más apropiada porque reduce la exposición de datos sensibles.
-
-## 8. Seguridad y validaciones
-
-- Validación del lado cliente con Bootstrap.
-- Validación del lado servidor en controladores.
-- Sanitización de entradas.
-- Consultas con PDO y sentencias preparadas.
-- Control de acceso por rol.
-
-## 9. Contraseñas con MD5
-
-Por requisito académico, las contraseñas se guardan y comparan con `md5()`.
-
-### Qué conviene explicar en la defensa
-
-- MD5 es un hash de una sola vía.
-- No permite recuperar la contraseña original de forma directa.
-- No es una solución moderna para producción, pero sirve para demostrar el concepto de hash en un TP.
-
-## 10. Base de datos
-
-Tablas incluidas:
-
-- users
-- airlines
-- flights
-- promotions
-- reservations
-- news
-
-Relaciones principales:
-
-- `flights.airline_id` -> `airlines.id`
-- `reservations.user_id` -> `users.id`
-- `reservations.flight_id` -> `flights.id`
-- `promotions.airline_id` -> `airlines.id`
-
-## 11. Paginación y mails
-
-- Paginación en listados de vuelos y novedades.
-- Envío de mails con `mail()` para registro y reservas.
-- Si el servidor local no tiene correo configurado, el sistema registra un fallback en archivo de log.
-
-## 12. Recomendaciones para presentación oral
-
-Al exponer el TP conviene mostrar:
-
-1. Estructura del proyecto.
-2. Login y control de sesiones.
-3. Protección de rutas por rol.
-4. Un CRUD completo.
-5. Reglas de negocio de reservas.
-6. Base de datos y relaciones.
-7. Paginación y validaciones.
-8. Mecanismo de mails.
-
-## 13. Material adicional
-
-- Informe final: [INFORME_FINAL.md](INFORME_FINAL.md)
-- Script SQL: [sql/schema.sql](sql/schema.sql)
+1. Importar `sql/schema.sql` en MySQL.
+2. Configurar XAMPP con Apache y MySQL activos.
+3. Verificar credenciales en `app/config/config.php`.
+4. Servir la carpeta `public` como entrada web.
+5. Navegar por `index.php?page=home`, `login`, `flights`, `reservations`, `admin` o `ceo`.

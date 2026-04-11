@@ -1,36 +1,146 @@
 :root {
-  --bg: #f4f7fb;
-  --text: #1f2937;
-  --brand: #0b5cab;
-  --brand-dark: #093e73;
+  --bg: #eef3f9;
+  --text: #13243a;
+  --brand: #0b3d91;
+  --brand-dark: #072c6a;
+  --accent: #d7192d;
+  --surface: #ffffff;
 }
 
 body {
   min-height: 100vh;
   color: var(--text);
-  background: radial-gradient(circle at 10% 10%, #dbeafe, transparent 35%), var(--bg);
+  background:
+    radial-gradient(circle at 8% 0%, rgba(11, 61, 145, 0.16), transparent 34%),
+    linear-gradient(180deg, #f8fbff 0%, var(--bg) 60%, #e7eef8 100%);
 }
 
 .app-navbar {
-  background: linear-gradient(90deg, var(--brand), var(--brand-dark));
+  background: #ffffff;
+  border-bottom: 1px solid #d7e2ef;
+  box-shadow: 0 8px 22px rgba(7, 24, 55, 0.06);
+}
+
+.brand-strip {
+  height: 4px;
+  background: linear-gradient(90deg, var(--brand) 0 72%, var(--accent) 72% 100%);
+}
+
+.navbar .navbar-brand {
+  color: var(--brand);
+  font-weight: 800;
+  letter-spacing: 0.2px;
+}
+
+.navbar .nav-link {
+  color: #27496f;
+  font-weight: 600;
+}
+
+.navbar .nav-link:hover,
+.navbar .nav-link:focus,
+.navbar .nav-link.active {
+  color: var(--brand);
 }
 
 .hero {
-  background: linear-gradient(120deg, #dbeafe, #e0f2fe);
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #d7e2ef;
+  background: linear-gradient(130deg, #ffffff 15%, #e7f0fc 58%, #d9e8fb 100%);
+}
+
+.hero::after {
+  content: "";
+  position: absolute;
+  top: -40px;
+  right: -50px;
+  width: 260px;
+  height: 260px;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(11, 61, 145, 0.25), rgba(11, 61, 145, 0));
+  pointer-events: none;
+}
+
+.hero .btn-primary {
+  background: linear-gradient(90deg, var(--brand), #0f5bcf);
+  border-color: transparent;
+}
+
+.hero .btn-outline-primary {
+  color: var(--brand);
+  border-color: #9bb8e8;
+}
+
+.hero-kicker {
+  color: #2e5fa6;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
+.hero-panel {
+  border-radius: 16px;
+  background: linear-gradient(145deg, #ffffff 30%, #f1f6ff 100%);
+}
+
+.metric-card {
+  border-left: 4px solid var(--brand);
+}
+
+.metric-label {
+  color: #4f6d90;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.metric-value {
+  color: #082f72;
+  font-size: 1.5rem;
+  font-weight: 800;
+}
+
+.destination-card {
+  border-radius: 14px;
+  border: 1px solid #dce6f3;
+  background: linear-gradient(135deg, #ffffff 0%, #f3f8ff 100%);
+  box-shadow: 0 8px 22px rgba(10, 39, 79, 0.06);
+}
+
+.destination-city {
+  color: #153d70;
+  font-weight: 800;
+  font-size: 1.05rem;
+}
+
+.cta-banner {
+  border: 1px solid #144592;
+  background: linear-gradient(120deg, #0b3d91, #0a56c2);
+  color: #f2f7ff;
 }
 
 .card {
-  border: 0;
-  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
+  border: 1px solid #dce6f3;
+  border-radius: 14px;
+  background: var(--surface);
+  box-shadow: 0 10px 24px rgba(11, 37, 74, 0.06);
+}
+
+.section-title {
+  color: #12365f;
+  font-weight: 800;
+  letter-spacing: 0.2px;
 }
 
 .site-footer {
-  background: #0f172a;
-  color: #e2e8f0;
+  border-top: 1px solid #d5e0ee;
+  background: #f8fbff;
+  color: #3b5576;
 }
 
 .site-footer a {
-  color: #93c5fd;
+  color: #1b4f95;
   text-decoration: none;
 }
 
@@ -38,8 +148,23 @@ body {
   text-decoration: underline;
 }
 
+.pill-user {
+  border: 1px solid #d6e2f1;
+  color: #28496f;
+  background: #f2f7ff;
+}
+
 @media (max-width: 768px) {
   .hero {
     padding: 1.2rem !important;
+  }
+
+  .navbar .nav-link {
+    padding-top: 0.35rem;
+    padding-bottom: 0.35rem;
+  }
+
+  .metric-value {
+    font-size: 1.28rem;
   }
 }

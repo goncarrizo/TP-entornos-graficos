@@ -1,7 +1,8 @@
 <?php $user = current_user(); ?>
-<nav class="navbar navbar-expand-lg navbar-dark app-navbar" aria-label="Barra principal de navegacion">
+<div class="brand-strip" aria-hidden="true"></div>
+<nav class="navbar navbar-expand-lg navbar-light app-navbar" aria-label="Barra principal de navegacion">
   <div class="container">
-    <a class="navbar-brand fw-bold" href="<?php echo BASE_URL; ?>/index.php?page=home">AeroUTN</a>
+    <a class="navbar-brand" href="<?php echo BASE_URL; ?>/index.php?page=home">AirARG</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Alternar navegacion">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -23,13 +24,13 @@
       </ul>
       <div class="d-flex gap-2 align-items-center">
         <?php if ($user): ?>
-          <span class="badge text-bg-light"><?php echo htmlspecialchars($user['name']); ?> (<?php echo htmlspecialchars($user['role']); ?>)</span>
+          <span class="badge pill-user"><?php echo htmlspecialchars($user['name']); ?> (<?php echo htmlspecialchars($user['role']); ?>)</span>
           <form method="post" action="<?php echo BASE_URL; ?>/index.php?page=home" class="m-0">
             <input type="hidden" name="action" value="logout">
-            <button class="btn btn-sm btn-light" type="submit">Salir</button>
+            <button class="btn btn-sm btn-outline-primary" type="submit">Salir</button>
           </form>
         <?php else: ?>
-          <a class="btn btn-sm btn-light" href="<?php echo BASE_URL; ?>/index.php?page=login">Ingresar</a>
+          <a class="btn btn-sm btn-primary" href="<?php echo BASE_URL; ?>/index.php?page=login">Ingresar</a>
         <?php endif; ?>
       </div>
     </div>

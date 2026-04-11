@@ -22,7 +22,7 @@ class AuthController
         // Se usa aqui por requerimiento academico, aunque hoy no se recomienda en produccion.
         $hash = md5($password);
         User::create($name, $email, $hash);
-        send_app_mail($email, 'Registro AeroUTN', "Hola $name, tu cuenta fue creada correctamente.");
+        send_app_mail($email, 'Registro AirARG', "Hola $name, tu cuenta fue creada correctamente.");
         flash('ok', 'Registro exitoso. Ya podes iniciar sesion.');
         redirect_to('login');
     }
