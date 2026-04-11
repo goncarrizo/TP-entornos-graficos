@@ -2,6 +2,24 @@
 
 class AdminController
 {
+    public static function exportSalesCsv(): void
+    {
+        require_role('admin');
+
+        $rows = Report::salesByAirline();
+
+        header('Content-Type: text/csv; charset=utf-8');
+        header('Content-Disposition: attachment; filename="reporte_ventas_admin.csv"');
+
+        $out = fopen('php://output', 'w');
+        fputcsv($out, ['Aerolinea', 'Ventas confirmadas']);
+        foreach ($rows as $row) {
+            fputcsv($out, [$row['airline'], (float) $row['total_sales']]);
+        }
+        fclose($out);
+        exit;
+    }
+
     public static function panel(): void
     {
         require_role('admin');

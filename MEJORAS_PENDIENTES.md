@@ -1,54 +1,49 @@
-# Checklist de mejoras para la web
+# TODO de mejoras visuales (AirARG)
 
-Este todo propone mejoras posibles para la version PHP/XAMPP del proyecto, respetando exclusivamente HTML5, CSS3, Bootstrap, JavaScript, jQuery, PHP, MySQL y XAMPP.
+Checklist enfocado en look & feel, fotos, efectos y acciones visuales, manteniendo stack PHP + Bootstrap + JS.
 
-## Prioridad alta
+## Prioridad alta (impacto inmediato)
 
-- [ ] Mejorar la vista de inicio con un buscador de vuelos mas visible y directo.
-- [ ] Unificar el estilo visual de todas las pantallas con una misma guia de colores, espaciados y botones.
-- [ ] Hacer el formulario de registro mas completo y claro para el usuario.
-- [ ] Mejorar la pantalla de login con mensajes de error mas visibles y mejor jerarquia visual.
-- [ ] Mostrar mejor el estado de sesion en el header con acceso rapido a cuenta, reservas y salida.
-- [ ] Asegurar que todas las paginas tengan footer fijo al final cuando hay poco contenido.
-- [ ] Revisar validaciones de formularios en cliente y servidor para que sean mas consistentes.
-- [ ] Mejorar los mensajes de confirmacion y error con alertas mas legibles.
+- [x] Definir una guia visual base: paleta final, escala tipografica, espaciados y radios.
+- [x] Reemplazar bloques planos por imagenes reales de destinos en Home, Vuelos y Novedades.
+- [x] Unificar estilo de botones principales/secundarios (hover, active, disabled, focus visible).
+- [x] Mejorar hero principal con foto de fondo de alta calidad + gradiente de contraste.
+- [x] Convertir cards de vuelos en formato mas visual: iconos, chips de estado, precio destacado.
+- [x] Mejorar jerarquia visual de formularios (titulos, ayudas, errores y estados de exito).
+- [x] Agregar estados vacios ilustrados (sin resultados, sin reservas, sin noticias).
+- [x] Reforzar contraste y legibilidad general para accesibilidad AA.
 
-## Prioridad media
+## Prioridad media (experiencia y microinteraccion)
 
-- [ ] Agregar filtros mas completos en la busqueda de vuelos.
-- [ ] Mejorar la paginacion de listados para que sea mas clara en mobile.
-- [ ] Agregar un panel de gestion de cuenta con datos personales, cambio de clave y resumen de actividad.
-- [ ] Hacer mas visual la vista de reservas con cards, estados y acciones destacadas.
-- [ ] Agregar vistas vacias elegantes cuando no haya resultados.
-- [ ] Mejorar el diseño de los paneles Admin y CEO para que se entiendan mas rapido.
-- [ ] Agregar estados visuales por rol con badges o etiquetas claras.
-- [ ] Revisar la navegacion para reducir links repetidos y dejar opciones mas ordenadas.
+- [x] Agregar microanimaciones suaves en cards, dropdowns, tabs y alertas.
+- [x] Incorporar transiciones de entrada para secciones al hacer scroll (sin exceso).
+- [x] Añadir skeleton loaders para listados de vuelos y noticias.
+- [x] Mejorar paginacion mobile con controles compactos y mas visibles.
+- [x] Agregar indicador visual de pagina activa en navbar y breadcrumbs en paneles.
+- [x] Crear galeria simple de destinos con tarjetas de imagen + CTA.
+- [x] Mejorar visual de reservas con timeline de estado (pendiente, confirmada, cancelada).
+- [x] Agregar feedback visual inmediato en acciones clave (favorito, reservar, cancelar).
 
-## Prioridad baja
+## Prioridad baja (polish)
 
-- [ ] Agregar iconografia simple en botones y tarjetas usando solo Bootstrap y SVGs propios.
-- [ ] Hacer microanimaciones suaves en dropdowns, cards y botones.
-- [ ] Agregar una seccion de ayuda o preguntas frecuentes.
-- [ ] Incorporar una pagina de contacto simple con formulario y validacion basica.
-- [ ] Mejorar la accesibilidad con labels, aria y contraste mas fuerte.
-- [ ] Optimizar textos y microcopy para que sean mas claros para el usuario.
-- [ ] Revisar el esquema SQL para sumar campos utiles si el trabajo lo requiere.
-- [ ] Agregar una pagina de estados del sistema o salud interna para administracion.
+- [ ] Incluir variantes de tema de fondos por seccion (Home, Vuelos, Admin, CEO).
+- [ ] Refinar animaciones con easing consistente y duraciones estandar.
+- [ ] Agregar parallax leve en hero (solo desktop, con fallback mobile).
+- [ ] Mejorar detalles de iconografia SVG (grosor, alineacion, consistencia visual).
+- [ ] Integrar placeholders visuales cuando falten fotos reales.
+- [ ] Revisar coherencia de sombras, bordes y profundidad en todos los componentes.
 
-## Mantenimiento tecnico
+## Biblioteca de assets visuales
 
-- [ ] Revisar que todos los enlaces usen rutas correctas dentro de XAMPP.
-- [ ] Mantener el codigo PHP separado por responsabilidad: controladores, modelos, vistas y helpers.
-- [ ] Evitar duplicacion de estilos y centralizar la apariencia en una sola hoja CSS.
-- [ ] Mantener la validacion de contraseñas y sesiones en un solo flujo de autenticacion.
-- [ ] Confirmar que los cambios visuales no rompan el uso en mobile.
-- [ ] Documentar cada mejora importante en una guia corta de uso o despliegue.
+- [ ] Armar carpeta de imagenes optimizadas por seccion (webp/jpg comprimido).
+- [ ] Definir criterios de recorte y proporciones (hero, card horizontal, card vertical).
+- [ ] Crear set minimo de ilustraciones SVG propias (empty states y ayudas).
+- [ ] Agregar favicon y variantes de icono para consistencia de marca.
 
-## Ideas de evolucion futura sin salir de la consigna
+## QA visual (obligatorio antes de cerrar)
 
-- [ ] Añadir favoritos de vuelos.
-- [ ] Agregar busqueda por precio o duracion.
-- [ ] Mostrar historial de cambios de reserva.
-- [ ] Permitir editar datos de cuenta desde una pantalla dedicada.
-- [ ] Agregar exportacion de reportes simples en CSV.
-- [ ] Incluir mas contenido dinamico en la home segun el usuario autenticado.
+- [ ] Validar responsive real en 360px, 768px, 1024px y desktop amplio.
+- [ ] Revisar foco de teclado en todos los controles interactivos.
+- [ ] Probar rendimiento visual (sin animaciones pesadas en equipos lentos).
+- [ ] Verificar que efectos respeten `prefers-reduced-motion`.
+- [ ] Confirmar que las imagenes no rompan layout ni CLS.

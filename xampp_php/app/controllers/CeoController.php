@@ -2,6 +2,49 @@
 
 class CeoController
 {
+    public static function exportSalesCsv(): void
+    {
+        require_role('ceo');
+
+        $rows = Report::salesByAirline();
+
+        header('Content-Type: text/csv; charset=utf-8');
+        header('Content-Disposition: attachment; filename="reporte_ventas_ceo.csv"');
+
+        $out = fopen('php://output', 'w');
+        fputcsv($out, ['Aerolinea', 'Ventas confirmadas']);
+        foreach ($rows as $row) {
+            fputcsv($out, [$row['airline'], (float) $row['total_sales']]);
+        }
+        fclose($out);
+        exit;
+    }
+
+    public static function exportOccupancyCsv(): void
+    {
+        require_role('ceo');
+
+        $rows = Report::occupancyByFlight();
+
+        header('Content-Type: text/csv; charset=utf-8');
+        header('Content-Disposition: attachment; filename="reporte_ocupacion_ceo.csv"');
+
+        $out = fopen('php://output', 'w');
+        fputcsv($out, ['Vuelo ID', 'Origen', 'Destino', 'Asientos totales', 'Asientos ocupados', 'Ocupacion %']);
+        foreach ($rows as $row) {
+            fputcsv($out, [
+                (int) $row['id'],
+                $row['origin'],
+                $row['destination'],
+                (int) $row['total_seats'],
+                (int) $row['occupied_seats'],
+                (float) $row['occupancy_percent'],
+            ]);
+        }
+        fclose($out);
+        exit;
+    }
+
     public static function panel(): void
     {
         require_role('ceo');

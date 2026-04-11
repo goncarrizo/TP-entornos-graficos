@@ -2,7 +2,7 @@
 
 class Flight
 {
-    public static function countFiltered(?string $origin = null, ?string $destination = null, ?string $date = null): int
+    public static function countFiltered(?string $origin = null, ?string $destination = null, ?string $date = null, ?int $airlineId = null, ?float $minPrice = null, ?float $maxPrice = null, ?int $minSeats = null, ?int $maxDurationMinutes = null): int
     {
         $sql = 'SELECT COUNT(*) AS c FROM flights f WHERE 1 = 1';
         $params = [];
@@ -22,13 +22,38 @@ class Flight
             $params['date'] = $date;
         }
 
+        if ($airlineId && $airlineId > 0) {
+            $sql .= ' AND f.airline_id = :airline_id';
+            $params['airline_id'] = $airlineId;
+        }
+
+        if ($minPrice !== null && $minPrice >= 0) {
+            $sql .= ' AND f.price >= :min_price';
+            $params['min_price'] = $minPrice;
+        }
+
+        if ($maxPrice !== null && $maxPrice >= 0) {
+            $sql .= ' AND f.price <= :max_price';
+            $params['max_price'] = $maxPrice;
+        }
+
+        if ($minSeats !== null && $minSeats > 0) {
+            $sql .= ' AND f.available_seats >= :min_seats';
+            $params['min_seats'] = $minSeats;
+        }
+
+        if ($maxDurationMinutes !== null && $maxDurationMinutes > 0) {
+            $sql .= ' AND TIMESTAMPDIFF(MINUTE, f.departure_time, f.arrival_time) <= :max_duration';
+            $params['max_duration'] = $maxDurationMinutes;
+        }
+
         $stmt = Database::connection()->prepare($sql);
         $stmt->execute($params);
         $row = $stmt->fetch();
         return (int) $row['c'];
     }
 
-    public static function all(?string $origin = null, ?string $destination = null, ?string $date = null): array
+    public static function all(?string $origin = null, ?string $destination = null, ?string $date = null, ?int $airlineId = null, ?float $minPrice = null, ?float $maxPrice = null, ?int $minSeats = null, ?int $maxDurationMinutes = null, string $sort = 'departure_asc'): array
     {
         $sql = "SELECT f.*, a.name AS airline_name, p.title AS promo_title, p.discount_percent
                 FROM flights f
@@ -53,14 +78,39 @@ class Flight
             $params['date'] = $date;
         }
 
-        $sql .= ' ORDER BY f.departure_time ASC';
+        if ($airlineId && $airlineId > 0) {
+            $sql .= ' AND f.airline_id = :airline_id';
+            $params['airline_id'] = $airlineId;
+        }
+
+        if ($minPrice !== null && $minPrice >= 0) {
+            $sql .= ' AND f.price >= :min_price';
+            $params['min_price'] = $minPrice;
+        }
+
+        if ($maxPrice !== null && $maxPrice >= 0) {
+            $sql .= ' AND f.price <= :max_price';
+            $params['max_price'] = $maxPrice;
+        }
+
+        if ($minSeats !== null && $minSeats > 0) {
+            $sql .= ' AND f.available_seats >= :min_seats';
+            $params['min_seats'] = $minSeats;
+        }
+
+        if ($maxDurationMinutes !== null && $maxDurationMinutes > 0) {
+            $sql .= ' AND TIMESTAMPDIFF(MINUTE, f.departure_time, f.arrival_time) <= :max_duration';
+            $params['max_duration'] = $maxDurationMinutes;
+        }
+
+        $sql .= ' ' . self::buildOrderBy($sort);
 
         $stmt = Database::connection()->prepare($sql);
         $stmt->execute($params);
         return $stmt->fetchAll();
     }
 
-    public static function paginated(int $limit, int $offset, ?string $origin = null, ?string $destination = null, ?string $date = null): array
+    public static function paginated(int $limit, int $offset, ?string $origin = null, ?string $destination = null, ?string $date = null, ?int $airlineId = null, ?float $minPrice = null, ?float $maxPrice = null, ?int $minSeats = null, ?int $maxDurationMinutes = null, string $sort = 'departure_asc'): array
     {
         $sql = "SELECT f.*, a.name AS airline_name, p.title AS promo_title, p.discount_percent
                 FROM flights f
@@ -85,7 +135,32 @@ class Flight
             $params['date'] = $date;
         }
 
-        $sql .= ' ORDER BY f.departure_time ASC LIMIT :limit OFFSET :offset';
+        if ($airlineId && $airlineId > 0) {
+            $sql .= ' AND f.airline_id = :airline_id';
+            $params['airline_id'] = $airlineId;
+        }
+
+        if ($minPrice !== null && $minPrice >= 0) {
+            $sql .= ' AND f.price >= :min_price';
+            $params['min_price'] = $minPrice;
+        }
+
+        if ($maxPrice !== null && $maxPrice >= 0) {
+            $sql .= ' AND f.price <= :max_price';
+            $params['max_price'] = $maxPrice;
+        }
+
+        if ($minSeats !== null && $minSeats > 0) {
+            $sql .= ' AND f.available_seats >= :min_seats';
+            $params['min_seats'] = $minSeats;
+        }
+
+        if ($maxDurationMinutes !== null && $maxDurationMinutes > 0) {
+            $sql .= ' AND TIMESTAMPDIFF(MINUTE, f.departure_time, f.arrival_time) <= :max_duration';
+            $params['max_duration'] = $maxDurationMinutes;
+        }
+
+        $sql .= ' ' . self::buildOrderBy($sort) . ' LIMIT :limit OFFSET :offset';
 
         $stmt = Database::connection()->prepare($sql);
         foreach ($params as $k => $v) {
@@ -168,5 +243,24 @@ class Flight
         $stmt = Database::connection()->query('SELECT COUNT(*) AS c FROM flights');
         $row = $stmt->fetch();
         return (int) $row['c'];
+    }
+
+    private static function buildOrderBy(string $sort): string
+    {
+        switch ($sort) {
+            case 'price_asc':
+                return 'ORDER BY f.price ASC';
+            case 'price_desc':
+                return 'ORDER BY f.price DESC';
+            case 'seats_desc':
+                return 'ORDER BY f.available_seats DESC, f.departure_time ASC';
+            case 'duration_asc':
+                return 'ORDER BY TIMESTAMPDIFF(MINUTE, f.departure_time, f.arrival_time) ASC';
+            case 'departure_desc':
+                return 'ORDER BY f.departure_time DESC';
+            case 'departure_asc':
+            default:
+                return 'ORDER BY f.departure_time ASC';
+        }
     }
 }

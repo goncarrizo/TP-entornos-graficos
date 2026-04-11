@@ -28,8 +28,8 @@ class ReservationController
 
         $totalAmount = (float) $flight['price'] * $seats;
 
-        $reservationId = Reservation::create((int) $user['id'], $flightId, $seats, $totalAmount);
-        Reservation::confirm($reservationId);
+        $reservationId = Reservation::create((int) $user['id'], $flightId, $seats, $totalAmount, (int) $user['id']);
+        Reservation::confirm($reservationId, (int) $user['id']);
 
         $mailBody = "Reserva #$reservationId confirmada\n"
             . "Ruta: {$flight['origin']} -> {$flight['destination']}\n"
@@ -72,7 +72,7 @@ class ReservationController
         }
 
         if ($reservation['status'] !== 'cancelled') {
-            Reservation::cancel($reservationId);
+            Reservation::cancel($reservationId, (int) $user['id']);
             Flight::returnSeats((int) $reservation['flight_id'], (int) $reservation['seats']);
             send_app_mail((string) $user['email'], 'Reserva cancelada', "Tu reserva #$reservationId fue cancelada correctamente.");
             flash('ok', 'Reserva cancelada correctamente.');
@@ -86,6 +86,15 @@ class ReservationController
         require_login();
         $user = current_user();
         $reservations = Reservation::byUser((int) $user['id']);
-        view('reservations', ['reservations' => $reservations]);
+        $history = Reservation::historyByUser((int) $user['id']);
+        $historyByReservation = [];
+        foreach ($history as $change) {
+            $historyByReservation[(int) $change['reservation_id']][] = $change;
+        }
+
+        view('reservations', [
+            'reservations' => $reservations,
+            'history_by_reservation' => $historyByReservation,
+        ]);
     }
 }

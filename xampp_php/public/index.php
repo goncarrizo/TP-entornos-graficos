@@ -23,8 +23,14 @@ if ($action) {
             case 'change_password':
                 AuthController::changePassword();
                 break;
+            case 'contact_submit':
+                SiteController::contactSubmit();
+                break;
             case 'reserve':
                 ReservationController::reserve();
+                break;
+            case 'toggle_favorite':
+                FlightController::toggleFavorite();
                 break;
             case 'cancel_reservation':
                 ReservationController::cancel();
@@ -71,6 +77,15 @@ if ($action) {
             case 'delete_news':
                 AdminController::deleteNews();
                 break;
+            case 'export_sales_csv_admin':
+                AdminController::exportSalesCsv();
+                break;
+            case 'export_sales_csv_ceo':
+                CeoController::exportSalesCsv();
+                break;
+            case 'export_occupancy_csv_ceo':
+                CeoController::exportOccupancyCsv();
+                break;
             default:
                 flash('error', 'Accion no reconocida.');
                 redirect_to('home');
@@ -83,9 +98,21 @@ if ($action) {
 
 switch ($page) {
     case 'home':
+        $homeUser = is_logged_in() ? current_user() : null;
+        $favoriteFlights = [];
+        $recentReservations = [];
+
+        if ($homeUser) {
+            $favoriteFlights = Favorite::flightsByUser((int) $homeUser['id'], 3);
+            $recentReservations = array_slice(Reservation::byUser((int) $homeUser['id']), 0, 3);
+        }
+
         view('home', [
+            'user' => $homeUser,
             'airlines' => Airline::all(),
             'news' => News::all(),
+            'favorite_flights' => $favoriteFlights,
+            'recent_reservations' => $recentReservations,
         ]);
         break;
     case 'login':
@@ -96,10 +123,46 @@ switch ($page) {
         break;
     case 'profile':
         require_login();
-        view('profile', ['user' => current_user()]);
+        $profileUser = current_user();
+        $profileReservations = Reservation::byUser((int) $profileUser['id']);
+        $profileSummary = [
+            'total' => count($profileReservations),
+            'confirmed' => 0,
+            'cancelled' => 0,
+            'total_spent' => 0.0,
+        ];
+
+        foreach ($profileReservations as $reservationItem) {
+            if (($reservationItem['status'] ?? '') === 'cancelled') {
+                $profileSummary['cancelled']++;
+                continue;
+            }
+
+            $profileSummary['confirmed']++;
+            $profileSummary['total_spent'] += (float) ($reservationItem['total_amount'] ?? 0);
+        }
+
+        view('profile', [
+            'user' => $profileUser,
+            'summary' => $profileSummary,
+            'recent_reservations' => array_slice($profileReservations, 0, 5),
+        ]);
+        break;
+    case 'account_edit':
+        require_login();
+        view('account_edit', ['user' => current_user()]);
         break;
     case 'flights':
         FlightController::listPage();
+        break;
+    case 'faq':
+        view('faq');
+        break;
+    case 'contact':
+        view('contact');
+        break;
+    case 'system_status':
+        SiteController::systemStatusPage();
         break;
     case 'reservations':
         ReservationController::listPage();

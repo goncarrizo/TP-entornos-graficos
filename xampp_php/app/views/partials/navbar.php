@@ -1,5 +1,6 @@
 <?php
 $user = current_user();
+$activePage = $_GET['page'] ?? 'home';
 ?>
 <div class="brand-strip" aria-hidden="true"></div>
 <nav class="navbar navbar-expand-lg navbar-light app-navbar" aria-label="Barra principal de navegacion">
@@ -17,9 +18,14 @@ $user = current_user();
     </button>
     <div class="collapse navbar-collapse" id="mainNav">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li class="nav-item"><a class="nav-link" href="<?php echo BASE_URL; ?>/index.php?page=home">Home</a></li>
-        <li class="nav-item"><a class="nav-link" href="<?php echo BASE_URL; ?>/index.php?page=flights">Vuelos</a></li>
-        <li class="nav-item"><a class="nav-link" href="<?php echo BASE_URL; ?>/index.php?page=news">Novedades</a></li>
+        <li class="nav-item"><a class="nav-link <?php echo $activePage === 'home' ? 'active' : ''; ?>" href="<?php echo BASE_URL; ?>/index.php?page=home">Home</a></li>
+        <li class="nav-item"><a class="nav-link <?php echo $activePage === 'flights' ? 'active' : ''; ?>" href="<?php echo BASE_URL; ?>/index.php?page=flights">Vuelos</a></li>
+        <li class="nav-item"><a class="nav-link <?php echo $activePage === 'news' ? 'active' : ''; ?>" href="<?php echo BASE_URL; ?>/index.php?page=news">Novedades</a></li>
+        <li class="nav-item"><a class="nav-link <?php echo $activePage === 'faq' ? 'active' : ''; ?>" href="<?php echo BASE_URL; ?>/index.php?page=faq">Ayuda</a></li>
+        <li class="nav-item"><a class="nav-link <?php echo $activePage === 'contact' ? 'active' : ''; ?>" href="<?php echo BASE_URL; ?>/index.php?page=contact">Contacto</a></li>
+        <?php if ($user): ?>
+          <li class="nav-item"><a class="nav-link <?php echo $activePage === 'reservations' ? 'active' : ''; ?>" href="<?php echo BASE_URL; ?>/index.php?page=reservations">Mis reservas</a></li>
+        <?php endif; ?>
       </ul>
       <div class="d-flex gap-2 align-items-center">
         <?php if ($user): ?>
@@ -33,16 +39,17 @@ $user = current_user();
               </span>
               <span class="account-copy">
                 <span class="account-name"><?php echo htmlspecialchars($user['name']); ?></span>
-                <span class="account-role"><?php echo htmlspecialchars($user['role']); ?></span>
+                <span class="account-role"><span class="role-badge role-<?php echo htmlspecialchars($user['role']); ?>"><?php echo strtoupper(htmlspecialchars($user['role'])); ?></span></span>
               </span>
             </button>
             <ul class="dropdown-menu dropdown-menu-end dropdown-menu-animated shadow-sm">
               <li><h6 class="dropdown-header">Cuenta</h6></li>
-              <li><a class="dropdown-item" href="<?php echo BASE_URL; ?>/index.php?page=profile">Gestionar cuenta</a></li>
-              <li><a class="dropdown-item" href="<?php echo BASE_URL; ?>/index.php?page=reservations">Mis reservas</a></li>
+              <li><a class="dropdown-item" href="<?php echo BASE_URL; ?>/index.php?page=profile">Resumen de cuenta</a></li>
+              <li><a class="dropdown-item" href="<?php echo BASE_URL; ?>/index.php?page=account_edit">Editar datos</a></li>
               <li><hr class="dropdown-divider"></li>
               <?php if ($user['role'] === 'admin'): ?>
                 <li><a class="dropdown-item" href="<?php echo BASE_URL; ?>/index.php?page=admin">Panel Admin</a></li>
+                <li><a class="dropdown-item" href="<?php echo BASE_URL; ?>/index.php?page=system_status">Estado del sistema</a></li>
               <?php endif; ?>
               <?php if ($user['role'] === 'ceo'): ?>
                 <li><a class="dropdown-item" href="<?php echo BASE_URL; ?>/index.php?page=ceo">Panel CEO</a></li>
@@ -64,8 +71,20 @@ $user = current_user();
 </nav>
 <main class="container py-4">
   <?php if ($ok = flash('ok')): ?>
-    <div class="alert alert-success" role="status"><?php echo htmlspecialchars($ok); ?></div>
+    <div class="alert alert-success flash-inline" role="status">
+      <span class="flash-badge ok" aria-hidden="true">✓</span>
+      <div class="flash-content">
+        <strong>Listo</strong>
+        <span><?php echo htmlspecialchars($ok); ?></span>
+      </div>
+    </div>
   <?php endif; ?>
   <?php if ($error = flash('error')): ?>
-    <div class="alert alert-danger" role="alert"><?php echo htmlspecialchars($error); ?></div>
+    <div class="alert alert-danger flash-inline" role="alert">
+      <span class="flash-badge error" aria-hidden="true">!</span>
+      <div class="flash-content">
+        <strong>Atencion</strong>
+        <span><?php echo htmlspecialchars($error); ?></span>
+      </div>
+    </div>
   <?php endif; ?>

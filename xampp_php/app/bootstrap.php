@@ -14,9 +14,11 @@ require __DIR__ . '/models/Promotion.php';
 require __DIR__ . '/models/Reservation.php';
 require __DIR__ . '/models/News.php';
 require __DIR__ . '/models/Report.php';
+require __DIR__ . '/models/Favorite.php';
 
 require __DIR__ . '/controllers/AuthController.php';
 require __DIR__ . '/controllers/FlightController.php';
 require __DIR__ . '/controllers/ReservationController.php';
 require __DIR__ . '/controllers/AdminController.php';
 require __DIR__ . '/controllers/CeoController.php';
+require __DIR__ . '/controllers/SiteController.php';

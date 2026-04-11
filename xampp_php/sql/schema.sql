@@ -6,9 +6,13 @@ CREATE TABLE users (
   id INT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(100) NOT NULL,
   email VARCHAR(150) NOT NULL UNIQUE,
+  phone VARCHAR(20) NULL,
+  document_number VARCHAR(20) NULL,
+  birthdate DATE NULL,
   password_hash VARCHAR(32) NOT NULL,
   role ENUM('admin', 'ceo', 'customer') NOT NULL DEFAULT 'customer',
   email_verified TINYINT(1) NOT NULL DEFAULT 0,
+  last_login_at DATETIME NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -31,7 +35,10 @@ CREATE TABLE flights (
   total_seats INT NOT NULL,
   available_seats INT NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT fk_flights_airline FOREIGN KEY (airline_id) REFERENCES airlines(id)
+  CONSTRAINT fk_flights_airline FOREIGN KEY (airline_id) REFERENCES airlines(id),
+  INDEX idx_flights_route_date (origin, destination, departure_time),
+  INDEX idx_flights_price (price),
+  INDEX idx_flights_available (available_seats)
 );
 
 CREATE TABLE promotions (
@@ -57,8 +64,41 @@ CREATE TABLE reservations (
   status ENUM('pending', 'confirmed', 'cancelled') NOT NULL DEFAULT 'pending',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_res_user FOREIGN KEY (user_id) REFERENCES users(id),
-  CONSTRAINT fk_res_flight FOREIGN KEY (flight_id) REFERENCES flights(id)
+  CONSTRAINT fk_res_flight FOREIGN KEY (flight_id) REFERENCES flights(id),
+  INDEX idx_res_user_created (user_id, created_at),
+  INDEX idx_res_status (status)
 );
+
+CREATE TABLE reservation_status_history (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  reservation_id INT NOT NULL,
+  from_status ENUM('pending', 'confirmed', 'cancelled') NULL,
+  to_status ENUM('pending', 'confirmed', 'cancelled') NOT NULL,
+  changed_by_user_id INT NULL,
+  note VARCHAR(255) NULL,
+  changed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_rsh_reservation FOREIGN KEY (reservation_id) REFERENCES reservations(id),
+  CONSTRAINT fk_rsh_user FOREIGN KEY (changed_by_user_id) REFERENCES users(id),
+  INDEX idx_rsh_res_changed (reservation_id, changed_at)
+);
+
+CREATE TABLE user_favorites (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  flight_id INT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_fav_user FOREIGN KEY (user_id) REFERENCES users(id),
+  CONSTRAINT fk_fav_flight FOREIGN KEY (flight_id) REFERENCES flights(id),
+  CONSTRAINT uq_user_favorite UNIQUE (user_id, flight_id),
+  INDEX idx_fav_user_created (user_id, created_at)
+);
+
+-- Si la base ya existe, usar ALTER para sumar mejoras sin reinstalar todo:
+-- ALTER TABLE users ADD COLUMN phone VARCHAR(20) NULL, ADD COLUMN document_number VARCHAR(20) NULL, ADD COLUMN birthdate DATE NULL, ADD COLUMN last_login_at DATETIME NULL;
+-- ALTER TABLE flights ADD INDEX idx_flights_route_date (origin, destination, departure_time), ADD INDEX idx_flights_price (price), ADD INDEX idx_flights_available (available_seats);
+-- ALTER TABLE reservations ADD INDEX idx_res_user_created (user_id, created_at), ADD INDEX idx_res_status (status);
+-- CREATE TABLE reservation_status_history (...);
+-- CREATE TABLE user_favorites (...);
 
 CREATE TABLE news (
   id INT AUTO_INCREMENT PRIMARY KEY,
