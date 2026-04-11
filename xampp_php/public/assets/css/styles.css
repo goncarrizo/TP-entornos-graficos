@@ -44,6 +44,34 @@ main {
   letter-spacing: 0.2px;
 }
 
+.brand-with-plane {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.brand-plane {
+  width: 1.45rem;
+  height: 1.45rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--brand), #0f63e0);
+  box-shadow: 0 6px 14px rgba(11, 61, 145, 0.18);
+  flex: 0 0 auto;
+}
+
+.brand-plane svg {
+  width: 0.95rem;
+  height: 0.95rem;
+  fill: #ffffff;
+  stroke: #ffffff;
+  stroke-width: 0.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
 .navbar .nav-link {
   color: #27496f;
   font-weight: 600;

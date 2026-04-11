@@ -4,7 +4,14 @@ $user = current_user();
 <div class="brand-strip" aria-hidden="true"></div>
 <nav class="navbar navbar-expand-lg navbar-light app-navbar" aria-label="Barra principal de navegacion">
   <div class="container">
-    <a class="navbar-brand" href="<?php echo BASE_URL; ?>/index.php?page=home">AirARG</a>
+    <a class="navbar-brand brand-with-plane" href="<?php echo BASE_URL; ?>/index.php?page=home">
+      <span class="brand-plane" aria-hidden="true">
+        <svg viewBox="0 0 24 24" role="img" aria-hidden="true" focusable="false">
+          <path d="M2.5 13.2c0-.7.5-1.3 1.2-1.5l6.1-1.6 4.8-6.1c.5-.6 1.2-1 2-1h1l-2 7.3 4.8-1.3 2.3-2.2c.3-.3.8-.5 1.2-.5h.8c.8 0 1.5.7 1.5 1.5 0 .5-.2 1-.6 1.3l-2.2 2 2.2 2c.4.3.6.8.6 1.3 0 .8-.7 1.5-1.5 1.5h-.8c-.5 0-.9-.2-1.2-.5l-2.3-2.2-4.8-1.3 2 7.3h-1c-.8 0-1.5-.4-2-1l-4.8-6.1-6.1-1.6c-.7-.2-1.2-.8-1.2-1.5Z"></path>
+        </svg>
+      </span>
+      <span>AirARG</span>
+    </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Alternar navegacion">
       <span class="navbar-toggler-icon"></span>
     </button>

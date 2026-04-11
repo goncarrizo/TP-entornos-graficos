@@ -15,13 +15,10 @@ class AuthController
 
         $fullName = trim($name . ' ' . $lastname);
 
-        $validPhone = (bool) preg_match('/^[0-9+\-]{8,20}$/', $phone);
-        $validDocument = (bool) preg_match('/^[0-9]{7,10}$/', $document);
-        $validBirthdate = (bool) preg_match('/^\d{4}-\d{2}-\d{2}$/', $birthdate);
         $passwordsMatch = $password !== '' && $password === $passwordConfirm;
 
-        if ($fullName === '' || !valid_email($email) || strlen($password) < 6 || !$passwordsMatch || !$validPhone || !$validDocument || !$validBirthdate) {
-            flash('error', 'Datos invalidos en registro.');
+        if (!valid_name($name) || !valid_name($lastname) || !valid_email($email) || !valid_phone($phone) || !valid_document($document) || !valid_birthdate($birthdate) || !valid_password($password) || !$passwordsMatch) {
+            flash('error', 'Revisa los datos del registro antes de continuar.');
             redirect_to('register');
         }
 
@@ -100,8 +97,8 @@ class AuthController
         $name = clean_text($_POST['name'] ?? '');
         $email = clean_email($_POST['email'] ?? '');
 
-        if ($name === '' || !valid_email($email)) {
-            flash('error', 'Datos invalidos para actualizar tu cuenta.');
+        if (!valid_name($name) || !valid_email($email)) {
+            flash('error', 'Revisa los datos de tu cuenta.');
             redirect_to('profile');
         }
 
@@ -134,7 +131,7 @@ class AuthController
         $newPassword = (string) ($_POST['new_password'] ?? '');
         $confirmPassword = (string) ($_POST['confirm_password'] ?? '');
 
-        if (strlen($currentPassword) < 6 || strlen($newPassword) < 6 || $newPassword !== $confirmPassword) {
+        if (!valid_password($currentPassword) || !valid_password($newPassword) || $newPassword !== $confirmPassword) {
             flash('error', 'Revisa los datos de cambio de clave.');
             redirect_to('profile');
         }
