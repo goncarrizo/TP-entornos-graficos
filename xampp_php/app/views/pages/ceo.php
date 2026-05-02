@@ -84,7 +84,7 @@
             <div class="col-md-8"><small class="text-muted">Disponibles: <span class="status-badge info"><?php echo (int) $flight['available_seats']; ?></span></small></div>
             <div class="col-md-4 d-flex gap-2 justify-content-md-end">
               <button class="btn btn-sm btn-warning" name="action" value="update_flight" type="submit">Editar</button>
-              <button class="btn btn-sm btn-danger" name="action" value="delete_flight" type="submit" onclick="return confirm('Eliminar vuelo?');">Eliminar</button>
+              <button class="btn btn-sm btn-danger" name="action" value="delete_flight" type="submit">Eliminar</button>
             </div>
           </form>
         <?php endforeach; ?>
@@ -129,7 +129,7 @@
               <div class="col-12 small text-muted">Estado admin: <span class="status-badge <?php echo $statusClass; ?>"><?php echo htmlspecialchars($promotion['status']); ?></span></div>
               <div class="col-12 d-flex gap-2">
                 <button class="btn btn-sm btn-warning" name="action" value="update_promotion" type="submit">Editar</button>
-                <button class="btn btn-sm btn-danger" name="action" value="delete_promotion" type="submit" onclick="return confirm('Eliminar promocion?');">Eliminar</button>
+                <button class="btn btn-sm btn-danger" name="action" value="delete_promotion" type="submit">Eliminar</button>
               </div>
             </div>
           </form>

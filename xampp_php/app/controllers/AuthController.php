@@ -30,7 +30,7 @@ class AuthController
         // MD5: hash de una sola via (irreversible en forma directa).
         // Se usa aqui por requerimiento academico, aunque hoy no se recomienda en produccion.
         $hash = md5($password);
-        User::create($fullName, $email, $hash);
+        User::create($fullName, $email, $phone, $document, $birthdate, $hash);
         send_app_mail($email, 'Registro AirARG', "Hola $fullName, tu cuenta fue creada correctamente.");
         flash('ok', 'Registro exitoso. Ya podes iniciar sesion.');
         redirect_to('login');

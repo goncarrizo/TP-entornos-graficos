@@ -34,7 +34,7 @@
             <div class="col-md-3"><input name="country" value="<?php echo htmlspecialchars($airline['country']); ?>" class="form-control" required></div>
             <div class="col-md-3 d-flex gap-2">
               <button class="btn btn-sm btn-warning" name="action" value="update_airline" type="submit">Editar</button>
-              <button class="btn btn-sm btn-danger" name="action" value="delete_airline" type="submit" onclick="return confirm('Eliminar aerolinea?');">Eliminar</button>
+              <button class="btn btn-sm btn-danger" name="action" value="delete_airline" type="submit">Eliminar</button>
             </div>
           </form>
         <?php endforeach; ?>
@@ -104,7 +104,7 @@
             <textarea name="content" class="form-control mb-2" rows="3" required><?php echo htmlspecialchars($item['content']); ?></textarea>
             <div class="d-flex gap-2">
               <button class="btn btn-sm btn-warning" name="action" value="update_news" type="submit">Editar</button>
-              <button class="btn btn-sm btn-danger" name="action" value="delete_news" type="submit" onclick="return confirm('Eliminar novedad?');">Eliminar</button>
+              <button class="btn btn-sm btn-danger" name="action" value="delete_news" type="submit">Eliminar</button>
             </div>
           </form>
         <?php endforeach; ?>

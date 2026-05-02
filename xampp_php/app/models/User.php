@@ -22,14 +22,17 @@ class User
         return $row ?: null;
     }
 
-    public static function create(string $name, string $email, string $passwordHash): bool
+    public static function create(string $name, string $email, string $phone, string $documentNumber, string $birthdate, string $passwordHash): bool
     {
-        $sql = 'INSERT INTO users (name, email, password_hash, role, email_verified) VALUES (:name, :email, :password_hash, :role, :email_verified)';
+        $sql = 'INSERT INTO users (name, email, phone, document_number, birthdate, password_hash, role, email_verified) VALUES (:name, :email, :phone, :document_number, :birthdate, :password_hash, :role, :email_verified)';
         $stmt = Database::connection()->prepare($sql);
 
         return $stmt->execute([
             'name' => $name,
             'email' => $email,
+            'phone' => $phone,
+            'document_number' => $documentNumber,
+            'birthdate' => $birthdate,
             'password_hash' => $passwordHash,
             'role' => 'customer',
             'email_verified' => 1,
