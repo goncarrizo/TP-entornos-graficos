@@ -1,0 +1,29 @@
+version: '3.8'
+services:
+  web:
+    build:
+      context: ./xampp_php
+    ports:
+      - "8080:80"
+    depends_on:
+      - db
+    environment:
+      DB_HOST: db
+      DB_USER: root
+      DB_PASS: example
+      DB_NAME: airarg_db
+      APP_URL: http://localhost:8080
+    volumes:
+      - ./xampp_php:/var/www/html:cached
+
+  db:
+    image: mysql:8.0
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+      MYSQL_DATABASE: airarg_db
+    volumes:
+      - db_data:/var/lib/mysql
+
+volumes:
+  db_data:
