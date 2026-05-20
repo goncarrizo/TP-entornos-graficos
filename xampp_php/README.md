@@ -12,6 +12,7 @@ Esta carpeta contiene la implementación MVC del trabajo práctico pensada para 
 - `app/helpers`: sesión, vistas, validación, mail y utilidades.
 - `app/views`: páginas HTML/PHP y parciales reutilizables.
 - `sql/schema.sql`: esquema completo y datos semilla.
+- `sql/migrations/`: migraciones SQL incrementales para crear y actualizar el esquema.
 - `INFORME_FINAL.md`: documentación académica del proyecto.
 
 ## Funcionalidades

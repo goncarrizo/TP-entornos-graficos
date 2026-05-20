@@ -19,6 +19,7 @@ La version oficial para presentar esta en [xampp_php](xampp_php).
 - [xampp_php/public/index.php](xampp_php/public/index.php): front controller y router
 - [xampp_php/app](xampp_php/app): controladores, modelos, helpers y vistas
 - [xampp_php/sql/schema.sql](xampp_php/sql/schema.sql): script SQL de la entrega
+- [xampp_php/sql/migrations](xampp_php/sql/migrations): migraciones incrementales de base de datos
 - [GUIA_XAMPP_MYSQL_PASO_A_PASO.md](GUIA_XAMPP_MYSQL_PASO_A_PASO.md): guia operativa de XAMPP
 - [ENTREGA_UTN_XAMPP.md](ENTREGA_UTN_XAMPP.md): checklist de cumplimiento contra consigna
 
