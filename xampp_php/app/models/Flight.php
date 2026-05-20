@@ -182,6 +182,20 @@ class Flight
         return $row ?: null;
     }
 
+    public static function existsByDetails(array $data): bool
+    {
+        $sql = 'SELECT 1 FROM flights WHERE airline_id = :airline_id AND origin = :origin AND destination = :destination AND departure_time = :departure_time AND arrival_time = :arrival_time LIMIT 1';
+        $stmt = Database::connection()->prepare($sql);
+        $stmt->execute([
+            'airline_id' => (int) $data['airline_id'],
+            'origin' => $data['origin'],
+            'destination' => $data['destination'],
+            'departure_time' => $data['departure_time'],
+            'arrival_time' => $data['arrival_time'],
+        ]);
+        return (bool) $stmt->fetchColumn();
+    }
+
     public static function create(array $data): bool
     {
         $sql = 'INSERT INTO flights (airline_id, origin, destination, departure_time, arrival_time, price, total_seats, available_seats)
@@ -202,7 +216,7 @@ class Flight
 
     public static function update(int $id, array $data): bool
     {
-        $sql = 'UPDATE flights SET airline_id = :airline_id, origin = :origin, destination = :destination, departure_time = :departure_time, arrival_time = :arrival_time, price = :price, total_seats = :total_seats WHERE id = :id';
+        $sql = 'UPDATE flights SET airline_id = :airline_id, origin = :origin, destination = :destination, departure_time = :departure_time, arrival_time = :arrival_time, price = :price, total_seats = :total_seats, available_seats = :available_seats WHERE id = :id';
         $stmt = Database::connection()->prepare($sql);
 
         return $stmt->execute([
@@ -214,6 +228,7 @@ class Flight
             'arrival_time' => $data['arrival_time'],
             'price' => (float) $data['price'],
             'total_seats' => (int) $data['total_seats'],
+            'available_seats' => (int) ($data['available_seats'] ?? $data['total_seats']),
         ]);
     }
 

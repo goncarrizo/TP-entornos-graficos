@@ -9,6 +9,8 @@ require __DIR__ . '/helpers/mail.php';
 
 require __DIR__ . '/models/User.php';
 require __DIR__ . '/models/Airline.php';
+require __DIR__ . '/models/AirlineRequest.php';
+require __DIR__ . '/models/FlightRequest.php';
 require __DIR__ . '/models/Flight.php';
 require __DIR__ . '/models/Promotion.php';
 require __DIR__ . '/models/Reservation.php';

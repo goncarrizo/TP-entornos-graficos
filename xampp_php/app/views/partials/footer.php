@@ -20,5 +20,35 @@
     </div>
   </div>
 </footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  (() => {
+    'use strict';
+
+    const forms = document.querySelectorAll('.needs-validation');
+
+    Array.from(forms).forEach((form) => {
+      form.addEventListener('submit', (event) => {
+        const passwordInput = form.querySelector('input[name="password"]');
+        const passwordConfirmInput = form.querySelector('input[name="password_confirm"]');
+
+        if (passwordInput && passwordConfirmInput) {
+          if (passwordInput.value !== passwordConfirmInput.value) {
+            passwordConfirmInput.setCustomValidity('Las claves deben coincidir.');
+          } else {
+            passwordConfirmInput.setCustomValidity('');
+          }
+        }
+
+        if (!form.checkValidity()) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+
+        form.classList.add('was-validated');
+      }, false);
+    });
+  })();
+</script>
 </body>
 </html>

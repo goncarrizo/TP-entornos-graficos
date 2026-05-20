@@ -29,8 +29,85 @@ class AdminController
         $news = News::all();
         $reports = Report::general();
         $sales = Report::salesByAirline();
+        $pendingAirlineRequests = AirlineRequest::allPending();
+        $pendingFlightRequests = FlightRequest::allPending();
 
-        view('admin', compact('airlines', 'promotions', 'news', 'reports', 'sales'));
+        view('admin', compact('airlines', 'promotions', 'news', 'reports', 'sales', 'pendingAirlineRequests', 'pendingFlightRequests'));
+    }
+
+    public static function approveAirlineRequest(): void
+    {
+        require_role('admin');
+
+        $id = int_value($_POST['airline_request_id'] ?? 0);
+        $request = AirlineRequest::find($id);
+
+        if (!$request || $request['status'] !== 'pending') {
+            flash('error', 'Solicitud de aerolinea no encontrada o ya procesada.');
+            redirect_to('admin');
+        }
+
+        if (Airline::findByCode($request['code'])) {
+            flash('error', 'Ya existe una aerolinea con ese codigo.');
+            redirect_to('admin');
+        }
+
+        Airline::create($request['name'], $request['code'], $request['country']);
+        AirlineRequest::setStatus($id, 'approved', (int) current_user()['id']);
+        flash('ok', 'La propuesta de aerolinea fue aprobada y agregada al sistema.');
+        redirect_to('admin');
+    }
+
+    public static function denyAirlineRequest(): void
+    {
+        require_role('admin');
+
+        $id = int_value($_POST['airline_request_id'] ?? 0);
+        $request = AirlineRequest::find($id);
+
+        if (!$request || $request['status'] !== 'pending') {
+            flash('error', 'Solicitud de aerolinea no encontrada o ya procesada.');
+            redirect_to('admin');
+        }
+
+        AirlineRequest::setStatus($id, 'denied', (int) current_user()['id']);
+        flash('ok', 'La propuesta de aerolinea fue denegada.');
+        redirect_to('admin');
+    }
+
+    public static function approveFlightRequest(): void
+    {
+        require_role('admin');
+
+        $id = int_value($_POST['flight_request_id'] ?? 0);
+        $request = FlightRequest::find($id);
+
+        if (!$request || $request['status'] !== 'pending') {
+            flash('error', 'Solicitud de vuelo no encontrada o ya procesada.');
+            redirect_to('admin');
+        }
+
+        Flight::create($request);
+        FlightRequest::setStatus($id, 'approved', (int) current_user()['id']);
+        flash('ok', 'La solicitud de vuelo fue aprobada y el vuelo se agrego al sistema.');
+        redirect_to('admin');
+    }
+
+    public static function denyFlightRequest(): void
+    {
+        require_role('admin');
+
+        $id = int_value($_POST['flight_request_id'] ?? 0);
+        $request = FlightRequest::find($id);
+
+        if (!$request || $request['status'] !== 'pending') {
+            flash('error', 'Solicitud de vuelo no encontrada o ya procesada.');
+            redirect_to('admin');
+        }
+
+        FlightRequest::setStatus($id, 'denied', (int) current_user()['id']);
+        flash('ok', 'La solicitud de vuelo fue denegada.');
+        redirect_to('admin');
     }
 
     public static function createAirline(): void

@@ -51,6 +51,7 @@ Este script:
 ```
 http://127.0.0.1/xampp_php/public/
 ```
+http://localhost/TP-entornos-graficos/xampp_php/public/index.php
 
 ---
 

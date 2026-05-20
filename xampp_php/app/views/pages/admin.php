@@ -7,10 +7,8 @@
   <span class="status-badge info">Aerolineas: <?php echo count($airlines); ?></span>
   <span class="status-badge warning">Promociones: <?php echo count($promotions); ?></span>
   <span class="status-badge success">Novedades: <?php echo count($news); ?></span>
-</section>
-
-<div class="row g-4">
-  <section class="col-lg-6" aria-labelledby="airlines-admin-title">
+    <span class="status-badge secondary">Propuestas de aerolinea: <?php echo count($pendingAirlineRequests); ?></span>
+    <span class="status-badge secondary">Solicitudes de vuelo: <?php echo count($pendingFlightRequests); ?></span>
     <div class="card p-3">
       <h2 id="airlines-admin-title" class="h5">1) ABMC Aerolineas</h2>
       <form class="row g-2 needs-validation mb-3" method="post" action="<?php echo BASE_URL; ?>/index.php?page=admin" novalidate>
@@ -35,6 +33,60 @@
             <div class="col-md-3 d-flex gap-2">
               <button class="btn btn-sm btn-warning" name="action" value="update_airline" type="submit">Editar</button>
               <button class="btn btn-sm btn-danger" name="action" value="delete_airline" type="submit">Eliminar</button>
+            </div>
+          </form>
+        <?php endforeach; ?>
+      <?php endif; ?>
+    </div>
+  </section>
+
+  <section class="col-lg-6" aria-labelledby="airline-requests-admin-title">
+    <div class="card p-3">
+      <h2 id="airline-requests-admin-title" class="h5">2) Propuestas de aerolineas</h2>
+      <?php if (empty($pendingAirlineRequests)): ?>
+        <div class="empty-state compact">
+          <p class="mb-0">No hay propuestas de aerolinea pendientes.</p>
+        </div>
+      <?php else: ?>
+        <?php foreach ($pendingAirlineRequests as $request): ?>
+          <form class="border rounded p-2 mb-2" method="post" action="<?php echo BASE_URL; ?>/index.php?page=admin">
+            <input type="hidden" name="airline_request_id" value="<?php echo (int) $request['id']; ?>">
+            <div>
+              <strong><?php echo htmlspecialchars($request['name']); ?> (<?php echo htmlspecialchars($request['code']); ?>)</strong>
+              <div class="small text-muted"><?php echo htmlspecialchars($request['country']); ?> — propuesto por <?php echo htmlspecialchars($request['submitted_by_name']); ?></div>
+            </div>
+            <div class="d-flex gap-2 justify-content-end mt-3">
+              <button class="btn btn-sm btn-success" name="action" value="approve_airline_request" type="submit">Aprobar</button>
+              <button class="btn btn-sm btn-secondary" name="action" value="deny_airline_request" type="submit">Denegar</button>
+            </div>
+          </form>
+        <?php endforeach; ?>
+      <?php endif; ?>
+    </div>
+  </section>
+
+  <section class="col-lg-6" aria-labelledby="flight-requests-admin-title">
+    <div class="card p-3">
+      <h2 id="flight-requests-admin-title" class="h5">3) Solicitudes de nuevos vuelos</h2>
+      <?php if (empty($pendingFlightRequests)): ?>
+        <div class="empty-state compact">
+          <p class="mb-0">No hay solicitudes de vuelo pendientes.</p>
+        </div>
+      <?php else: ?>
+        <?php foreach ($pendingFlightRequests as $request): ?>
+          <form class="border rounded p-2 mb-2" method="post" action="<?php echo BASE_URL; ?>/index.php?page=admin">
+            <input type="hidden" name="flight_request_id" value="<?php echo (int) $request['id']; ?>">
+            <div class="d-flex justify-content-between align-items-start gap-2">
+              <div>
+                <strong><?php echo htmlspecialchars($request['airline_name']); ?></strong>
+                <div class="small text-muted"><?php echo htmlspecialchars($request['origin']); ?> → <?php echo htmlspecialchars($request['destination']); ?> | <?php echo htmlspecialchars(date('Y-m-d H:i', strtotime($request['departure_time']))); ?> - <?php echo htmlspecialchars(date('Y-m-d H:i', strtotime($request['arrival_time']))); ?></div>
+                <div class="small text-muted">Asientos: <?php echo (int) $request['total_seats']; ?> | Precio: $<?php echo number_format((float) $request['price'], 2); ?></div>
+                <div class="small text-muted">Propuesto por <?php echo htmlspecialchars($request['submitted_by_name']); ?></div>
+              </div>
+              <div class="d-flex gap-2">
+                <button class="btn btn-sm btn-success" name="action" value="approve_flight_request" type="submit">Aprobar</button>
+                <button class="btn btn-sm btn-secondary" name="action" value="deny_flight_request" type="submit">Denegar</button>
+              </div>
             </div>
           </form>
         <?php endforeach; ?>

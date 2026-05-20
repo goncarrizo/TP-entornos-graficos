@@ -79,15 +79,26 @@ class FlightController
             'arrival_time' => clean_text($_POST['arrival_time'] ?? ''),
             'price' => (float) ($_POST['price'] ?? 0),
             'total_seats' => int_value($_POST['total_seats'] ?? 0),
+            'submitted_by' => (int) current_user()['id'],
         ];
 
-        if ($data['airline_id'] < 1 || $data['origin'] === '' || $data['destination'] === '' || $data['total_seats'] < 1) {
-            flash('error', 'Datos invalidos para crear vuelo.');
+        if ($data['airline_id'] < 1 || $data['origin'] === '' || $data['destination'] === '' || $data['departure_time'] === '' || $data['arrival_time'] === '' || $data['price'] <= 0 || $data['total_seats'] < 1) {
+            flash('error', 'Datos invalidos para solicitar un nuevo vuelo.');
             redirect_to('ceo');
         }
 
-        Flight::create($data);
-        flash('ok', 'Vuelo creado correctamente.');
+        if (Flight::existsByDetails($data)) {
+            flash('error', 'Ya existe un vuelo con esos mismos datos.');
+            redirect_to('ceo');
+        }
+
+        if (FlightRequest::existsDuplicate($data)) {
+            flash('error', 'Ya existe una solicitud de vuelo pendiente con esos mismos datos.');
+            redirect_to('ceo');
+        }
+
+        FlightRequest::create($data);
+        flash('ok', 'Solicitud de vuelo enviada para revision admin.');
         redirect_to('ceo');
     }
 
@@ -111,6 +122,19 @@ class FlightController
             redirect_to('ceo');
         }
 
+        $flight = Flight::find($id);
+        if (!$flight) {
+            flash('error', 'Vuelo no encontrado.');
+            redirect_to('ceo');
+        }
+
+        $reservedSeats = max(0, (int) $flight['total_seats'] - (int) $flight['available_seats']);
+        if ($data['total_seats'] < $reservedSeats) {
+            flash('error', 'No se puede reducir la cantidad total de asientos por debajo de los ya reservados.');
+            redirect_to('ceo');
+        }
+
+        $data['available_seats'] = max(0, $data['total_seats'] - $reservedSeats);
         Flight::update($id, $data);
         flash('ok', 'Vuelo actualizado correctamente.');
         redirect_to('ceo');

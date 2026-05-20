@@ -29,15 +29,14 @@ class ReservationController
         $totalAmount = (float) $flight['price'] * $seats;
 
         $reservationId = Reservation::create((int) $user['id'], $flightId, $seats, $totalAmount, (int) $user['id']);
-        Reservation::confirm($reservationId, (int) $user['id']);
 
-        $mailBody = "Reserva #$reservationId confirmada\n"
+        $mailBody = "Reserva #$reservationId creada y pendiente de aprobacion\n"
             . "Ruta: {$flight['origin']} -> {$flight['destination']}\n"
             . "Asientos: $seats\n"
             . "Total: $" . number_format($totalAmount, 2);
-        send_app_mail((string) $user['email'], 'Reserva confirmada', $mailBody);
+        send_app_mail((string) $user['email'], 'Reserva pendiente de aprobacion', $mailBody);
 
-        flash('ok', 'Reserva realizada y confirmada.');
+        flash('ok', 'Reserva realizada. El CEO debe aprobarla antes de confirmarla.');
         redirect_to('reservations');
     }
 

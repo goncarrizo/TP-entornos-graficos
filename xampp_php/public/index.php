@@ -56,6 +56,9 @@ if ($action) {
             case 'create_airline':
                 AdminController::createAirline();
                 break;
+            case 'create_airline_request':
+                CeoController::createAirlineRequest();
+                break;
             case 'update_airline':
                 AdminController::updateAirline();
                 break;
@@ -67,6 +70,24 @@ if ($action) {
                 break;
             case 'deny_promotion':
                 AdminController::denyPromotion();
+                break;
+            case 'approve_airline_request':
+                AdminController::approveAirlineRequest();
+                break;
+            case 'deny_airline_request':
+                AdminController::denyAirlineRequest();
+                break;
+            case 'approve_flight_request':
+                AdminController::approveFlightRequest();
+                break;
+            case 'deny_flight_request':
+                AdminController::denyFlightRequest();
+                break;
+            case 'approve_reservation':
+                CeoController::approveReservation();
+                break;
+            case 'deny_reservation':
+                CeoController::denyReservation();
                 break;
             case 'create_news':
                 AdminController::createNews();

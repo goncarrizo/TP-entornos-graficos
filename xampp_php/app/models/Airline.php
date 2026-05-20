@@ -8,6 +8,15 @@ class Airline
         return $stmt->fetchAll();
     }
 
+    public static function findByCode(string $code): ?array
+    {
+        $sql = 'SELECT * FROM airlines WHERE code = :code LIMIT 1';
+        $stmt = Database::connection()->prepare($sql);
+        $stmt->execute(['code' => $code]);
+        $row = $stmt->fetch();
+        return $row ?: null;
+    }
+
     public static function create(string $name, string $code, string $country): bool
     {
         $sql = 'INSERT INTO airlines (name, code, country) VALUES (:name, :code, :country)';

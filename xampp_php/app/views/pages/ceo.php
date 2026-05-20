@@ -7,12 +7,13 @@
   <span class="status-badge info">Vuelos: <?php echo count($flights); ?></span>
   <span class="status-badge warning">Promociones: <?php echo count($promotions); ?></span>
   <span class="status-badge success">Aerolineas: <?php echo count($airlines); ?></span>
+  <span class="status-badge secondary">Propuestas: <?php echo count($pendingAirlineRequests); ?></span>
 </section>
 
 <div class="row g-4">
   <section class="col-lg-6" aria-labelledby="flight-ceo-title">
     <div class="card p-3">
-      <h2 id="flight-ceo-title" class="h5">1) Crear vuelo</h2>
+      <h2 id="flight-ceo-title" class="h5">1) Solicitar nuevo vuelo</h2>
       <form method="post" action="<?php echo BASE_URL; ?>/index.php?page=ceo" class="row g-2 needs-validation" novalidate>
         <input type="hidden" name="action" value="create_flight">
         <div class="col-md-6">
@@ -30,8 +31,77 @@
         <div class="col-md-6"><label class="form-label" for="flight_departure">Salida</label><input id="flight_departure" type="datetime-local" name="departure_time" class="form-control" required></div>
         <div class="col-md-6"><label class="form-label" for="flight_arrival">Llegada</label><input id="flight_arrival" type="datetime-local" name="arrival_time" class="form-control" required></div>
         <div class="col-md-6"><label class="form-label" for="flight_seats">Asientos</label><input id="flight_seats" type="number" min="1" name="total_seats" class="form-control" required></div>
-        <div class="col-md-6 d-grid align-self-end"><button class="btn btn-primary" type="submit">Crear vuelo</button></div>
+        <div class="col-md-6 d-grid align-self-end"><button class="btn btn-primary" type="submit">Enviar solicitud</button></div>
       </form>
+    </div>
+  </section>
+
+  <section class="col-lg-6" aria-labelledby="flight-requests-ceo-title">
+    <div class="card p-3">
+      <h2 id="flight-requests-ceo-title" class="h5">2) Mis solicitudes de vuelo</h2>
+      <?php if (empty($pendingFlightRequests)): ?>
+        <div class="empty-state compact">
+          <p class="mb-0">No tenes solicitudes de vuelo pendientes.</p>
+        </div>
+      <?php else: ?>
+        <?php foreach ($pendingFlightRequests as $request): ?>
+          <?php
+            $statusClass = 'info';
+            if ($request['status'] === 'approved') {
+                $statusClass = 'success';
+            } elseif ($request['status'] === 'denied') {
+                $statusClass = 'danger';
+            }
+          ?>
+          <div class="border rounded p-2 mb-2">
+            <div class="d-flex justify-content-between align-items-start gap-2">
+              <div>
+                <strong><?php echo htmlspecialchars($request['airline_name']); ?></strong>
+                <div class="small text-muted"><?php echo htmlspecialchars($request['origin']); ?> → <?php echo htmlspecialchars($request['destination']); ?></div>
+                <div class="small text-muted"><?php echo htmlspecialchars(date('Y-m-d H:i', strtotime($request['departure_time']))); ?> - <?php echo htmlspecialchars(date('Y-m-d H:i', strtotime($request['arrival_time']))); ?></div>
+              </div>
+              <span class="status-badge <?php echo $statusClass; ?>"><?php echo htmlspecialchars($request['status']); ?></span>
+            </div>
+            <div class="small mt-2 text-muted">Asientos: <?php echo (int) $request['total_seats']; ?> | Precio: $<?php echo number_format((float) $request['price'], 2); ?></div>
+          </div>
+        <?php endforeach; ?>
+      <?php endif; ?>
+    </div>
+  </section>
+
+  <section class="col-lg-6" aria-labelledby="reservation-approvals-ceo-title">
+    <div class="card p-3">
+      <h2 id="reservation-approvals-ceo-title" class="h5">3) Reservas pendientes por aprobar</h2>
+      <?php if (empty($pendingReservations)): ?>
+        <div class="empty-state compact">
+          <p class="mb-0">No hay reservas pendientes para aprobar.</p>
+        </div>
+      <?php else: ?>
+        <?php foreach ($pendingReservations as $reservation): ?>
+          <div class="border rounded p-2 mb-2">
+            <div class="row g-2 align-items-center">
+              <div class="col-12 col-md-8">
+                <strong><?php echo htmlspecialchars($reservation['user_name']); ?></strong>
+                <div class="small text-muted">Reserva #<?php echo (int) $reservation['id']; ?> | <?php echo htmlspecialchars($reservation['origin']); ?> → <?php echo htmlspecialchars($reservation['destination']); ?></div>
+                <div class="small text-muted">Salida: <?php echo htmlspecialchars(date('Y-m-d H:i', strtotime($reservation['departure_time']))); ?> | Asientos: <?php echo (int) $reservation['seats']; ?></div>
+                <div class="small text-muted">Total: $<?php echo number_format((float) $reservation['total_amount'], 2); ?></div>
+              </div>
+              <div class="col-12 col-md-4 d-flex gap-2 flex-wrap justify-content-md-end">
+                <form method="post" action="<?php echo BASE_URL; ?>/index.php?page=ceo" class="d-inline">
+                  <input type="hidden" name="action" value="approve_reservation">
+                  <input type="hidden" name="reservation_id" value="<?php echo (int) $reservation['id']; ?>">
+                  <button class="btn btn-sm btn-success" type="submit">Aprobar</button>
+                </form>
+                <form method="post" action="<?php echo BASE_URL; ?>/index.php?page=ceo" class="d-inline">
+                  <input type="hidden" name="action" value="deny_reservation">
+                  <input type="hidden" name="reservation_id" value="<?php echo (int) $reservation['id']; ?>">
+                  <button class="btn btn-sm btn-danger" type="submit">Denegar</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        <?php endforeach; ?>
+      <?php endif; ?>
     </div>
   </section>
 
@@ -54,6 +124,46 @@
         <div class="mb-2"><label class="form-label" for="promo_discount">Descuento %</label><input id="promo_discount" type="number" step="0.01" min="1" max="100" name="discount_percent" class="form-control" required></div>
         <button class="btn btn-success" type="submit">Crear promocion</button>
       </form>
+    </div>
+  </section>
+
+  <section class="col-lg-6" aria-labelledby="airline-requests-ceo-title">
+    <div class="card p-3">
+      <h2 id="airline-requests-ceo-title" class="h5">3) Propuestas de nueva aerolinea</h2>
+      <form method="post" action="<?php echo BASE_URL; ?>/index.php?page=ceo" class="row g-2 needs-validation" novalidate>
+        <input type="hidden" name="action" value="create_airline_request">
+        <div class="col-md-4"><label class="form-label" for="request_airline_name">Nombre</label><input id="request_airline_name" name="name" class="form-control" required></div>
+        <div class="col-md-3"><label class="form-label" for="request_airline_code">Codigo</label><input id="request_airline_code" name="code" class="form-control" required></div>
+        <div class="col-md-3"><label class="form-label" for="request_airline_country">Pais</label><input id="request_airline_country" name="country" class="form-control" required></div>
+        <div class="col-md-2 d-grid align-self-end"><button class="btn btn-primary" type="submit">Enviar</button></div>
+      </form>
+
+      <?php if (empty($pendingAirlineRequests)): ?>
+        <div class="empty-state compact">
+          <p class="mb-0">No tenes propuestas de aerolinea pendientes.</p>
+        </div>
+      <?php else: ?>
+        <?php foreach ($pendingAirlineRequests as $request): ?>
+          <?php
+            $statusClass = 'info';
+            if ($request['status'] === 'approved') {
+                $statusClass = 'success';
+            } elseif ($request['status'] === 'denied') {
+                $statusClass = 'danger';
+            }
+          ?>
+          <div class="border rounded p-2 mb-2">
+            <div class="d-flex justify-content-between align-items-start gap-2">
+              <div>
+                <strong><?php echo htmlspecialchars($request['name']); ?> (<?php echo htmlspecialchars($request['code']); ?>)</strong>
+                <div class="small mt-1 text-muted"><?php echo htmlspecialchars($request['country']); ?></div>
+              </div>
+              <span class="status-badge <?php echo $statusClass; ?>"><?php echo htmlspecialchars($request['status']); ?></span>
+            </div>
+            <div class="small mt-2 text-muted">Propuesto el <?php echo htmlspecialchars(date('Y-m-d', strtotime($request['created_at']))); ?></div>
+          </div>
+        <?php endforeach; ?>
+      <?php endif; ?>
     </div>
   </section>
 

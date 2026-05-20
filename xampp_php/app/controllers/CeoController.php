@@ -49,13 +49,91 @@ class CeoController
     {
         require_role('ceo');
 
+        $user = current_user();
         $flights = Flight::all();
         $airlines = Airline::all();
         $promotions = Promotion::all();
         $sales = Report::salesByAirline();
         $occupancy = Report::occupancyByFlight();
+        $pendingAirlineRequests = AirlineRequest::byUser((int) $user['id']);
+        $pendingFlightRequests = FlightRequest::byUser((int) $user['id']);
+        $pendingReservations = Reservation::allPending();
 
-        view('ceo', compact('flights', 'airlines', 'promotions', 'sales', 'occupancy'));
+        view('ceo', compact('flights', 'airlines', 'promotions', 'sales', 'occupancy', 'pendingAirlineRequests', 'pendingFlightRequests', 'pendingReservations'));
+    }
+
+    public static function approveReservation(): void
+    {
+        require_role('ceo');
+
+        $id = int_value($_POST['reservation_id'] ?? 0);
+        $reservation = Reservation::find($id);
+
+        if (!$reservation || $reservation['status'] !== 'pending') {
+            flash('error', 'Reserva no encontrada o ya procesada.');
+            redirect_to('ceo');
+        }
+
+        if (Reservation::confirm($id, (int) current_user()['id'])) {
+            flash('ok', 'Reserva aprobada y confirmada.');
+            send_app_mail((string) $reservation['user_email'], 'Reserva aprobada', "Tu reserva #$id ha sido aprobada y confirmada.");
+        } else {
+            flash('error', 'No se pudo aprobar la reserva.');
+        }
+
+        redirect_to('ceo');
+    }
+
+    public static function denyReservation(): void
+    {
+        require_role('ceo');
+
+        $id = int_value($_POST['reservation_id'] ?? 0);
+        $reservation = Reservation::find($id);
+
+        if (!$reservation || $reservation['status'] !== 'pending') {
+            flash('error', 'Reserva no encontrada o ya procesada.');
+            redirect_to('ceo');
+        }
+
+        if (Reservation::deny($id, (int) current_user()['id'])) {
+            Flight::returnSeats((int) $reservation['flight_id'], (int) $reservation['seats']);
+            flash('ok', 'Reserva denegada. Los asientos fueron liberados.');
+            send_app_mail((string) $reservation['user_email'], 'Reserva denegada', "Tu reserva #$id ha sido denegada por el CEO.");
+        } else {
+            flash('error', 'No se pudo denegar la reserva.');
+        }
+
+        redirect_to('ceo');
+    }
+
+    public static function createAirlineRequest(): void
+    {
+        require_role('ceo');
+
+        $name = clean_text($_POST['name'] ?? '');
+        $code = strtoupper(clean_text($_POST['code'] ?? ''));
+        $country = clean_text($_POST['country'] ?? '');
+        $userId = (int) current_user()['id'];
+
+        if ($name === '' || $code === '' || $country === '') {
+            flash('error', 'Completa todos los campos de la propuesta de aerolinea.');
+            redirect_to('ceo');
+        }
+
+        if (!preg_match('/^[A-Z0-9]{2,10}$/', $code)) {
+            flash('error', 'El codigo de aerolinea debe tener entre 2 y 10 caracteres alfanumericos.');
+            redirect_to('ceo');
+        }
+
+        if (Airline::findByCode($code) || AirlineRequest::findByCode($code)) {
+            flash('error', 'Ya existe una aerolinea o una propuesta con ese codigo.');
+            redirect_to('ceo');
+        }
+
+        AirlineRequest::create($name, $code, $country, $userId);
+        flash('ok', 'Tu propuesta de aerolinea fue enviada para revision admin.');
+        redirect_to('ceo');
     }
 
     public static function createPromotion(): void

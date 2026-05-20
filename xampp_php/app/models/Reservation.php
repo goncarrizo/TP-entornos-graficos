@@ -35,9 +35,42 @@ class Reservation
         return $ok;
     }
 
+    public static function deny(int $id, ?int $changedByUserId = null): bool
+    {
+        $current = self::find($id);
+        $fromStatus = $current['status'] ?? null;
+
+        $stmt = Database::connection()->prepare('UPDATE reservations SET status = :status WHERE id = :id');
+        $ok = $stmt->execute(['id' => $id, 'status' => 'denied']);
+
+        if ($ok && $fromStatus !== 'denied') {
+            self::logStatusChange($id, $fromStatus, 'denied', $changedByUserId, 'Reserva denegada');
+        }
+
+        return $ok;
+    }
+
+    public static function allPending(): array
+    {
+        $sql = "SELECT r.*, f.origin, f.destination, f.departure_time, f.arrival_time, a.name AS airline_name, u.name AS user_name, u.email AS user_email
+                FROM reservations r
+                JOIN flights f ON f.id = r.flight_id
+                JOIN airlines a ON a.id = f.airline_id
+                JOIN users u ON u.id = r.user_id
+                WHERE r.status = 'pending'
+                ORDER BY r.created_at ASC";
+        $stmt = Database::connection()->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
     public static function find(int $id): ?array
     {
-        $sql = 'SELECT r.*, f.departure_time FROM reservations r JOIN flights f ON f.id = r.flight_id WHERE r.id = :id LIMIT 1';
+        $sql = 'SELECT r.*, f.departure_time, f.origin, f.destination, u.email AS user_email, u.name AS user_name
+                FROM reservations r
+                JOIN flights f ON f.id = r.flight_id
+                JOIN users u ON u.id = r.user_id
+                WHERE r.id = :id LIMIT 1';
         $stmt = Database::connection()->prepare($sql);
         $stmt->execute(['id' => $id]);
         $row = $stmt->fetch();

@@ -53,7 +53,7 @@ class SiteController
                 'db_message' => $dbMessage,
                 'server_time' => date('Y-m-d H:i:s'),
                 'mail_log_exists' => $mailLogExists,
-                'mail_log_path' => 'xampp_php/app/tmp/mail.log',
+                'mail_log_path' => 'tmp/mail.log',
             ],
         ]);
     }

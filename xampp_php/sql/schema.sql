@@ -24,6 +24,22 @@ CREATE TABLE airlines (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE airline_requests (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(120) NOT NULL,
+  code VARCHAR(10) NOT NULL,
+  country VARCHAR(80) NOT NULL,
+  status ENUM('pending', 'approved', 'denied') NOT NULL DEFAULT 'pending',
+  submitted_by INT NOT NULL,
+  reviewed_by INT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  reviewed_at DATETIME NULL,
+  CONSTRAINT fk_airline_requests_submitted_by FOREIGN KEY (submitted_by) REFERENCES users(id),
+  CONSTRAINT fk_airline_requests_reviewed_by FOREIGN KEY (reviewed_by) REFERENCES users(id),
+  INDEX idx_airline_requests_status (status),
+  UNIQUE KEY uq_airline_requests_code (code)
+);
+
 CREATE TABLE flights (
   id INT AUTO_INCREMENT PRIMARY KEY,
   airline_id INT NOT NULL,
@@ -39,6 +55,27 @@ CREATE TABLE flights (
   INDEX idx_flights_route_date (origin, destination, departure_time),
   INDEX idx_flights_price (price),
   INDEX idx_flights_available (available_seats)
+);
+
+CREATE TABLE flight_requests (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  airline_id INT NOT NULL,
+  origin VARCHAR(80) NOT NULL,
+  destination VARCHAR(80) NOT NULL,
+  departure_time DATETIME NOT NULL,
+  arrival_time DATETIME NOT NULL,
+  price DECIMAL(10,2) NOT NULL,
+  total_seats INT NOT NULL,
+  status ENUM('pending', 'approved', 'denied') NOT NULL DEFAULT 'pending',
+  submitted_by INT NOT NULL,
+  reviewed_by INT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  reviewed_at DATETIME NULL,
+  CONSTRAINT fk_flight_requests_airline FOREIGN KEY (airline_id) REFERENCES airlines(id),
+  CONSTRAINT fk_flight_requests_submitted_by FOREIGN KEY (submitted_by) REFERENCES users(id),
+  CONSTRAINT fk_flight_requests_reviewed_by FOREIGN KEY (reviewed_by) REFERENCES users(id),
+  INDEX idx_flight_requests_status (status),
+  UNIQUE KEY uq_flight_requests_flight (airline_id, origin, destination, departure_time, arrival_time)
 );
 
 CREATE TABLE promotions (
