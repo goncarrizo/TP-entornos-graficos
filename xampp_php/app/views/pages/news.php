@@ -24,12 +24,6 @@
       <p class="mb-0">En breve vas a ver anuncios, promociones y actualizaciones de vuelos.</p>
     </div>
   <?php else: ?>
-    <div class="skeleton-wrap mb-3" data-skeleton-wrap>
-      <div class="skeleton-row" aria-hidden="true">
-        <div class="skeleton-block"></div>
-        <div class="skeleton-block"></div>
-      </div>
-    </div>
     <?php foreach ($news as $index => $item): ?>
       <article class="card p-3 mb-3">
         <img class="news-cover" src="<?php echo htmlspecialchars($newsImages[$index % count($newsImages)]); ?>" alt="Imagen de referencia para novedad de vuelos" loading="lazy">

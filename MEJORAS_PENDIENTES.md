@@ -23,6 +23,7 @@ Checklist enfocado en look & feel, fotos, efectos y acciones visuales, mantenien
 - [x] Crear galeria simple de destinos con tarjetas de imagen + CTA.
 - [x] Mejorar visual de reservas con timeline de estado (pendiente, confirmada, cancelada).
 - [x] Agregar feedback visual inmediato en acciones clave (favorito, reservar, cancelar).
+- [X] Accesibilidad para usuarios con dispacidad visual.
 
 ## Prioridad baja (polish)
 
@@ -38,12 +39,12 @@ Checklist enfocado en look & feel, fotos, efectos y acciones visuales, mantenien
 - [ ] Armar carpeta de imagenes optimizadas por seccion (webp/jpg comprimido).
 - [ ] Definir criterios de recorte y proporciones (hero, card horizontal, card vertical).
 - [ ] Crear set minimo de ilustraciones SVG propias (empty states y ayudas).
-- [ ] Agregar favicon y variantes de icono para consistencia de marca.
+- [x] Agregar favicon y variantes de icono para consistencia de marca.
 
 ## QA visual (obligatorio antes de cerrar)
 
-- [ ] Validar responsive real en 360px, 768px, 1024px y desktop amplio.
-- [ ] Revisar foco de teclado en todos los controles interactivos.
+- [x] Validar responsive real en 360px, 768px, 1024px y desktop amplio.
+- [x] Revisar foco de teclado en todos los controles interactivos.
 - [ ] Probar rendimiento visual (sin animaciones pesadas en equipos lentos).
 - [ ] Verificar que efectos respeten `prefers-reduced-motion`.
 - [ ] Confirmar que las imagenes no rompan layout ni CLS.

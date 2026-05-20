@@ -87,12 +87,7 @@ $destinationImages = [
 
 <section class="mb-4" aria-labelledby="flight-results-title">
   <h2 id="flight-results-title" class="h5">Resultados</h2>
-  <div class="skeleton-wrap mb-3" data-skeleton-wrap>
-    <div class="skeleton-row" aria-hidden="true">
-      <div class="skeleton-block"></div>
-      <div class="skeleton-block"></div>
-    </div>
-  </div>
+
   <?php if (empty($flights)): ?>
     <div class="empty-state">
       <span class="empty-state-illustration" aria-hidden="true">
