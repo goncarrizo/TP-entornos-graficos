@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="utf-8">
@@ -34,11 +34,12 @@
       foreach ($files as $f) {
         if (stripos($f, 'barlow') !== false || stripos($f, 'fraunces') !== false) {
           if (preg_match('/\.woff2$/i', $f)) {
-            echo '<link rel="preload" href="' . htmlspecialchars(BASE_URL . '/assets/fonts/' . $f) . '" as="font" type="font/woff2" crossorigin>\n';
+            echo '<link rel="preload" href="' . htmlspecialchars(BASE_URL . '/assets/fonts/' . $f) . '" as="font" type="font/woff2" crossorigin>' . PHP_EOL;
           }
         }
       }
     }
+  ?>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="<?php echo BASE_URL; ?>/assets/css/styles.css">
 </head>
