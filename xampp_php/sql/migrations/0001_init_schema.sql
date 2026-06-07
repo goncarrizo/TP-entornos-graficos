@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS users (
   phone VARCHAR(20) NULL,
   document_number VARCHAR(20) NULL,
   birthdate DATE NULL,
-  password_hash VARCHAR(32) NOT NULL,
+  password_hash VARCHAR(255) NOT NULL,
   role ENUM('admin', 'ceo', 'customer') NOT NULL DEFAULT 'customer',
   email_verified TINYINT(1) NOT NULL DEFAULT 0,
   last_login_at DATETIME NULL,

@@ -27,9 +27,8 @@ class AuthController
             redirect_to('register');
         }
 
-        // MD5: hash de una sola via (irreversible en forma directa).
-        // Se usa aqui por requerimiento academico, aunque hoy no se recomienda en produccion.
-        $hash = md5($password);
+        // Use password_hash (bcrypt/argon2 depending on PHP) for secure password storage.
+        $hash = password_hash($password, PASSWORD_DEFAULT);
         User::create($fullName, $email, $phone, $document, $birthdate, $hash);
         send_app_mail($email, 'Registro AirARG', "Hola $fullName, tu cuenta fue creada correctamente.");
         flash('ok', 'Registro exitoso. Ya podes iniciar sesion.');
@@ -43,9 +42,26 @@ class AuthController
 
         $user = User::findByEmail($email);
 
-        $hash = md5($password);
+        $dbHash = $user['password_hash'] ?? '';
 
-        if (!$user || $hash !== $user['password_hash']) {
+        $passwordValid = false;
+        // First try modern verify
+        if (!empty($dbHash) && password_verify($password, $dbHash)) {
+            $passwordValid = true;
+            // Rehash if algo changed
+            if (password_needs_rehash($dbHash, PASSWORD_DEFAULT)) {
+                User::updatePassword((int) $user['id'], password_hash($password, PASSWORD_DEFAULT));
+            }
+        }
+
+        // Fallback for legacy MD5 hashes: if stored hash is 32 chars and md5 matches, migrate it.
+        if (!$passwordValid && is_string($dbHash) && strlen($dbHash) === 32 && md5($password) === $dbHash) {
+            $passwordValid = true;
+            // Migrate to password_hash
+            User::updatePassword((int) $user['id'], password_hash($password, PASSWORD_DEFAULT));
+        }
+
+        if (!$user || !$passwordValid) {
             flash('error', 'Credenciales invalidas.');
             redirect_to('login');
         }
@@ -137,7 +153,16 @@ class AuthController
         }
 
         $dbUser = User::findByEmail($email);
-        if (!$dbUser || md5($currentPassword) !== $dbUser['password_hash']) {
+        $dbHash = $dbUser['password_hash'] ?? '';
+        $currentValid = false;
+        if (!empty($dbHash) && password_verify($currentPassword, $dbHash)) {
+            $currentValid = true;
+        }
+        // Legacy md5 support
+        if (!$currentValid && is_string($dbHash) && strlen($dbHash) === 32 && md5($currentPassword) === $dbHash) {
+            $currentValid = true;
+        }
+        if (!$dbUser || !$currentValid) {
             flash('error', 'La clave actual no es correcta.');
             redirect_to('profile');
         }
@@ -147,7 +172,7 @@ class AuthController
             redirect_to('profile');
         }
 
-        User::updatePassword($userId, md5($newPassword));
+        User::updatePassword($userId, password_hash($newPassword, PASSWORD_DEFAULT));
         flash('ok', 'Clave actualizada correctamente.');
         redirect_to('profile');
     }
