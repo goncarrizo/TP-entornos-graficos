@@ -75,7 +75,9 @@
 </section>
 
 <?php
-$destinationImages = [
+// Preferir assets locales cuando existan
+$destinationImages = [];
+$remoteMap = [
   'bariloche' => 'https://images.unsplash.com/photo-1589909202802-8f4aadce1849?auto=format&fit=crop&w=1200&q=80',
   'mendoza' => 'https://images.unsplash.com/photo-1602459651957-2f0580f2d0f3?auto=format&fit=crop&w=1200&q=80',
   'cordoba' => 'https://images.unsplash.com/photo-1599571234909-29ed5d1321d6?auto=format&fit=crop&w=1200&q=80',
@@ -83,6 +85,25 @@ $destinationImages = [
   'salta' => 'https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=1200&q=80',
   'buenos aires' => 'https://images.unsplash.com/photo-1612294037637-ec328d0e075e?auto=format&fit=crop&w=1200&q=80',
 ];
+
+foreach ($remoteMap as $k => $remote) {
+  $cleanName = str_replace(' ', '_', ucwords($k));
+  $localCandidates = [
+    __DIR__ . '/../../public/assets/images/' . 'PLACEHOLDER_' . $cleanName . '.svg',
+    __DIR__ . '/../../public/assets/images/' . strtolower($k) . '.webp',
+    __DIR__ . '/../../public/assets/images/' . strtolower($k) . '.jpg',
+  ];
+
+  $found = null;
+  foreach ($localCandidates as $candidate) {
+    if (file_exists($candidate)) {
+      $found = BASE_URL . '/assets/images/' . basename($candidate);
+      break;
+    }
+  }
+
+  $destinationImages[$k] = $found ?? $remote;
+}
 ?>
 
 <section class="mb-4" aria-labelledby="flight-results-title">
@@ -107,7 +128,12 @@ $destinationImages = [
         ?>
         <article class="col-md-6">
           <div class="card flight-card h-100 p-3">
-            <div class="flight-card-media" style="background-image: url('<?php echo htmlspecialchars($flightImage); ?>');"></div>
+            <?php $img = $flightImage; $img_webp = preg_replace('/(\.(jpg|jpeg|png|svg))(\?.*)?$/i', '.webp', $img); $img_avif = preg_replace('/(\.(jpg|jpeg|png|svg))(\?.*)?$/i', '.avif', $img); ?>
+            <picture class="flight-card-media">
+              <source srcset="<?php echo htmlspecialchars($img_avif); ?>" type="image/avif">
+              <source srcset="<?php echo htmlspecialchars($img_webp); ?>" type="image/webp">
+              <img src="<?php echo htmlspecialchars($img); ?>" alt="Imagen de <?php echo htmlspecialchars($flight['destination']); ?>" loading="lazy">
+            </picture>
             <div class="chip-row">
               <span class="chip">Vuelo #<?php echo (int) $flight['id']; ?></span>
               <span class="chip"><?php echo (int) round((strtotime($flight['arrival_time']) - strtotime($flight['departure_time'])) / 60); ?> min</span>

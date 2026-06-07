@@ -2,13 +2,13 @@
   "name": "tp-entornos-graficos-vuelos",
   "version": "1.0.0",
   "description": "Plataforma de gestion de reservas de vuelos - TP Entornos Graficos",
-  "main": "src/server.js",
+  "main": "xampp_php/public/index.php",
   "scripts": {
-    "dev": "nodemon src/server.js",
-    "start": "node src/server.js",
-    "dev:node": "nodemon src/server.js",
-    "start:node": "node src/server.js",
-    "health": "curl -sS http://localhost:3000/api/health",
+    "dev": "php -S 127.0.0.1:3000 -t xampp_php/public",
+    "start": "php -S 127.0.0.1:3000 -t xampp_php/public",
+    "dev:node": "php -S 127.0.0.1:3000 -t xampp_php/public",
+    "start:node": "php -S 127.0.0.1:3000 -t xampp_php/public",
+    "health": "curl -sS http://127.0.0.1:3000/index.php?page=home",
     "deploy:xampp": "./deploy_xampp.sh"
   },
   "dependencies": {

@@ -5,6 +5,15 @@ require __DIR__ . '/../app/bootstrap.php';
 $page = $_GET['page'] ?? 'home';
 $action = $_POST['action'] ?? null;
 
+// CSRF protection: validate any incoming POST early
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $token = $_POST['csrf_token'] ?? null;
+    if (!check_csrf($token)) {
+        flash('error', 'Token CSRF invalido o inexistente.');
+        redirect_to('home');
+    }
+}
+
 if ($action) {
     try {
         switch ($action) {

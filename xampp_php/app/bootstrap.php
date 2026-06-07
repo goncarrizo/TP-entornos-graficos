@@ -6,6 +6,7 @@ require __DIR__ . '/helpers/auth.php';
 require __DIR__ . '/helpers/view.php';
 require __DIR__ . '/helpers/validation.php';
 require __DIR__ . '/helpers/mail.php';
+require __DIR__ . '/helpers/csrf.php';
 
 require __DIR__ . '/models/User.php';
 require __DIR__ . '/models/Airline.php';

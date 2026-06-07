@@ -3,12 +3,33 @@ $featuredNews = array_slice($news, 0, 3);
 $statsFlights = 120;
 $statsTravelers = 18500;
 $statsPunctuality = 92;
-$destinationImages = [
+// Preferir assets locales si existen, si no usar URL remota
+$destinationImages = [];
+$remoteMap = [
   'Bariloche' => 'https://images.unsplash.com/photo-1589909202802-8f4aadce1849?auto=format&fit=crop&w=1200&q=80',
   'Mendoza' => 'https://images.unsplash.com/photo-1602459651957-2f0580f2d0f3?auto=format&fit=crop&w=1200&q=80',
   'Cordoba' => 'https://images.unsplash.com/photo-1599571234909-29ed5d1321d6?auto=format&fit=crop&w=1200&q=80',
   'Rosario' => 'https://images.unsplash.com/photo-1569152811536-fb47aced8409?auto=format&fit=crop&w=1200&q=80',
 ];
+
+foreach ($remoteMap as $k => $remote) {
+  $localCandidates = [
+    __DIR__ . '/../../public/assets/images/' . 'PLACEHOLDER_' . $k . '.svg',
+    __DIR__ . '/../../public/assets/images/' . strtolower($k) . '.webp',
+    __DIR__ . '/../../public/assets/images/' . strtolower($k) . '.jpg',
+  ];
+
+  $found = null;
+  foreach ($localCandidates as $candidate) {
+    if (file_exists($candidate)) {
+      // map filesystem path to web path
+      $found = BASE_URL . '/assets/images/' . basename($candidate);
+      break;
+    }
+  }
+
+  $destinationImages[$k] = $found ?? $remote;
+}
 
 $newsImages = [
   'https://images.unsplash.com/photo-1529074963764-98f45c47344b?auto=format&fit=crop&w=1200&q=80',
@@ -160,29 +181,53 @@ $newsImages = [
   <h2 id="destinations-title" class="h4 section-title">Destinos destacados</h2>
   <div class="row g-3">
     <article class="col-md-6 col-xl-3">
-      <div class="destination-card p-3 h-100">
-        <img class="news-cover" src="<?php echo htmlspecialchars($destinationImages['Bariloche']); ?>" alt="Paisaje de Bariloche" loading="lazy">
-        <p class="destination-city mb-1">Bariloche</p>
-        <p class="mb-0 text-muted">Naturaleza, lagos y rutas patagonicas.</p>
-      </div>
+        <div class="destination-card p-3 h-100">
+          <?php $img = $destinationImages['Bariloche']; $img_webp = preg_replace('/(\.(jpg|jpeg|png|svg))(\?.*)?$/i', '.webp', $img); ?>
+          <picture>
+            <?php $img_avif = preg_replace('/(\.(jpg|jpeg|png|svg))(\?.*)?$/i', '.avif', $img); ?>
+            <source srcset="<?php echo htmlspecialchars($img_avif); ?>" type="image/avif">
+            <source srcset="<?php echo htmlspecialchars($img_webp); ?>" type="image/webp">
+            <img class="news-cover" src="<?php echo htmlspecialchars($img); ?>" alt="Paisaje de Bariloche" loading="lazy" data-placeholder="1" data-placeholder-label="Bariloche">
+          </picture>
+          <p class="destination-city mb-1">Bariloche</p>
+          <p class="mb-0 text-muted">Naturaleza, lagos y rutas patagonicas.</p>
+        </div>
     </article>
     <article class="col-md-6 col-xl-3">
       <div class="destination-card p-3 h-100">
-        <img class="news-cover" src="<?php echo htmlspecialchars($destinationImages['Mendoza']); ?>" alt="Paisaje de Mendoza" loading="lazy">
+        <?php $img = $destinationImages['Mendoza']; $img_webp = preg_replace('/(\.(jpg|jpeg|png|svg))(\?.*)?$/i', '.webp', $img); ?>
+        <picture>
+          <?php $img_avif = preg_replace('/(\.(jpg|jpeg|png|svg))(\?.*)?$/i', '.avif', $img); ?>
+          <source srcset="<?php echo htmlspecialchars($img_avif); ?>" type="image/avif">
+          <source srcset="<?php echo htmlspecialchars($img_webp); ?>" type="image/webp">
+          <img class="news-cover" src="<?php echo htmlspecialchars($img); ?>" alt="Paisaje de Mendoza" loading="lazy" data-placeholder="1" data-placeholder-label="Mendoza">
+        </picture>
         <p class="destination-city mb-1">Mendoza</p>
         <p class="mb-0 text-muted">Montana, gastronomia y escapadas urbanas.</p>
       </div>
     </article>
     <article class="col-md-6 col-xl-3">
       <div class="destination-card p-3 h-100">
-        <img class="news-cover" src="<?php echo htmlspecialchars($destinationImages['Cordoba']); ?>" alt="Ciudad de Cordoba" loading="lazy">
+        <?php $img = $destinationImages['Cordoba']; $img_webp = preg_replace('/(\.(jpg|jpeg|png|svg))(\?.*)?$/i', '.webp', $img); ?>
+        <picture>
+          <?php $img_avif = preg_replace('/(\.(jpg|jpeg|png|svg))(\?.*)?$/i', '.avif', $img); ?>
+          <source srcset="<?php echo htmlspecialchars($img_avif); ?>" type="image/avif">
+          <source srcset="<?php echo htmlspecialchars($img_webp); ?>" type="image/webp">
+          <img class="news-cover" src="<?php echo htmlspecialchars($img); ?>" alt="Ciudad de Cordoba" loading="lazy" data-placeholder="1" data-placeholder-label="Cordoba">
+        </picture>
         <p class="destination-city mb-1">Cordoba</p>
         <p class="mb-0 text-muted">Conectividad central para viajes de negocio.</p>
       </div>
     </article>
     <article class="col-md-6 col-xl-3">
       <div class="destination-card p-3 h-100">
-        <img class="news-cover" src="<?php echo htmlspecialchars($destinationImages['Rosario']); ?>" alt="Costanera de Rosario" loading="lazy">
+        <?php $img = $destinationImages['Rosario']; $img_webp = preg_replace('/(\.(jpg|jpeg|png|svg))(\?.*)?$/i', '.webp', $img); ?>
+        <picture>
+          <?php $img_avif = preg_replace('/(\.(jpg|jpeg|png|svg))(\?.*)?$/i', '.avif', $img); ?>
+          <source srcset="<?php echo htmlspecialchars($img_avif); ?>" type="image/avif">
+          <source srcset="<?php echo htmlspecialchars($img_webp); ?>" type="image/webp">
+          <img class="news-cover" src="<?php echo htmlspecialchars($img); ?>" alt="Costanera de Rosario" loading="lazy" data-placeholder="1" data-placeholder-label="Rosario">
+        </picture>
         <p class="destination-city mb-1">Rosario</p>
         <p class="mb-0 text-muted">Salidas frecuentes con tiempos de embarque rapidos.</p>
       </div>
@@ -198,7 +243,7 @@ $newsImages = [
   <div class="row g-3">
     <article class="col-md-6 col-xl-3">
       <div class="dest-gallery-card h-100">
-        <img src="<?php echo htmlspecialchars($destinationImages['Bariloche']); ?>" alt="Lago y montanas de Bariloche" loading="lazy">
+        <img src="<?php echo htmlspecialchars($destinationImages['Bariloche']); ?>" alt="Lago y montanas de Bariloche" loading="lazy" data-placeholder="1" data-placeholder-label="Bariloche">
         <div class="dest-gallery-copy">
           <p class="destination-city mb-1">Bariloche</p>
           <p class="mb-2 text-muted">Ideal para escapadas de invierno y turismo aventura.</p>
@@ -208,7 +253,7 @@ $newsImages = [
     </article>
     <article class="col-md-6 col-xl-3">
       <div class="dest-gallery-card h-100">
-        <img src="<?php echo htmlspecialchars($destinationImages['Mendoza']); ?>" alt="Vinedos y montana de Mendoza" loading="lazy">
+        <img src="<?php echo htmlspecialchars($destinationImages['Mendoza']); ?>" alt="Vinedos y montana de Mendoza" loading="lazy" data-placeholder="1" data-placeholder-label="Mendoza">
         <div class="dest-gallery-copy">
           <p class="destination-city mb-1">Mendoza</p>
           <p class="mb-2 text-muted">Rutas para turismo enologico y viajes de relax.</p>
@@ -218,7 +263,7 @@ $newsImages = [
     </article>
     <article class="col-md-6 col-xl-3">
       <div class="dest-gallery-card h-100">
-        <img src="<?php echo htmlspecialchars($destinationImages['Cordoba']); ?>" alt="Vista urbana de Cordoba" loading="lazy">
+        <img src="<?php echo htmlspecialchars($destinationImages['Cordoba']); ?>" alt="Vista urbana de Cordoba" loading="lazy" data-placeholder="1" data-placeholder-label="Cordoba">
         <div class="dest-gallery-copy">
           <p class="destination-city mb-1">Cordoba</p>
           <p class="mb-2 text-muted">Conexion central para viajes corporativos y eventos.</p>
@@ -228,7 +273,7 @@ $newsImages = [
     </article>
     <article class="col-md-6 col-xl-3">
       <div class="dest-gallery-card h-100">
-        <img src="<?php echo htmlspecialchars($destinationImages['Rosario']); ?>" alt="Costa urbana de Rosario" loading="lazy">
+        <img src="<?php echo htmlspecialchars($destinationImages['Rosario']); ?>" alt="Costa urbana de Rosario" loading="lazy" data-placeholder="1" data-placeholder-label="Rosario">
         <div class="dest-gallery-copy">
           <p class="destination-city mb-1">Rosario</p>
           <p class="mb-2 text-muted">Salidas frecuentes para viajes cortos y fin de semana.</p>
@@ -245,7 +290,7 @@ $newsImages = [
     <?php foreach ($featuredNews as $index => $item): ?>
       <article class="col-md-4">
         <div class="card h-100 p-3">
-          <img class="news-cover" src="<?php echo htmlspecialchars($newsImages[$index % count($newsImages)]); ?>" alt="Imagen relacionada con novedades de vuelos" loading="lazy">
+          <img class="news-cover" src="<?php echo htmlspecialchars($newsImages[$index % count($newsImages)]); ?>" alt="Imagen relacionada con novedades de vuelos" loading="lazy" data-placeholder="1" data-placeholder-label="Novedades de vuelos">
           <h3 class="h6 news-card-title"><?php echo htmlspecialchars($item['title']); ?></h3>
           <p class="news-card-text"><?php echo htmlspecialchars($item['content']); ?></p>
           <small class="text-muted"><?php echo htmlspecialchars($item['created_at']); ?></small>

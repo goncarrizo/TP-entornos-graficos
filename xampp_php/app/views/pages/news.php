@@ -26,7 +26,7 @@
   <?php else: ?>
     <?php foreach ($news as $index => $item): ?>
       <article class="card p-3 mb-3">
-        <img class="news-cover" src="<?php echo htmlspecialchars($newsImages[$index % count($newsImages)]); ?>" alt="Imagen de referencia para novedad de vuelos" loading="lazy">
+        <img class="news-cover" src="<?php echo htmlspecialchars($newsImages[$index % count($newsImages)]); ?>" alt="Imagen de referencia para novedad de vuelos" loading="lazy" data-placeholder="1" data-placeholder-label="Novedad de vuelos">
         <h2 class="h6 news-card-title"><?php echo htmlspecialchars($item['title']); ?></h2>
         <p class="mb-1 news-card-text"><?php echo htmlspecialchars($item['content']); ?></p>
         <small class="text-muted"><?php echo htmlspecialchars($item['created_at']); ?></small>

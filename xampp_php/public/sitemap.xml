@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>http://localhost/index.php?page=home</loc>
+  </url>
+  <url>
+    <loc>http://localhost/index.php?page=flights</loc>
+  </url>
+  <url>
+    <loc>http://localhost/index.php?page=news</loc>
+  </url>
+  <url>
+    <loc>http://localhost/index.php?page=contact</loc>
+  </url>
+  <url>
+    <loc>http://localhost/index.php?page=login</loc>
+  </url>
+</urlset>

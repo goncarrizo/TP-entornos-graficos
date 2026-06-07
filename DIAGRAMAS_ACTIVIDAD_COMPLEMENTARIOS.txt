@@ -1,0 +1,304 @@
+============================================================
+1. FLUJO GENERAL DE NAVEGACION DEL SITIO
+============================================================
+
+flowchart TD
+    A([Inicio]) --> B[Usuario abre AirARG]
+    B --> C[Se carga Home]
+    C --> D{¿Quiere navegar?}
+
+    D -- No --> Z([Fin: permanece en Home])
+    D -- Si --> E{¿Que seccion elige?}
+
+    E -- Home --> C
+    E -- Vuelos --> F[Ir a busqueda de vuelos]
+    E -- Novedades --> G[Ver novedades]
+    E -- Contacto --> H[Ir a formulario de contacto]
+    E -- Login --> I[Ir a iniciar sesion]
+    E -- Registro --> J[Ir a registro]
+    E -- Mi Cuenta --> K{¿Usuario logueado?}
+    E -- Panel Admin --> L{¿Rol admin?}
+    E -- Panel CEO --> M{¿Rol CEO?}
+
+    K -- No --> I
+    K -- Si --> N[Ver perfil / reservas]
+
+    L -- No --> I
+    L -- Si --> O[Entrar al panel admin]
+
+    M -- No --> I
+    M -- Si --> P[Entrar al panel CEO]
+
+    F --> Q[Consultar resultados y filtros]
+    G --> R[Leer novedades]
+    H --> S[Enviar consulta]
+    I --> T[Autenticacion]
+    J --> U[Alta de cuenta]
+    N --> V[Gestion de cuenta]
+    O --> W[ABMC y aprobaciones]
+    P --> X[ABMC y reportes]
+
+    Q --> Z
+    R --> Z
+    S --> Z
+    T --> Z
+    U --> Z
+    V --> Z
+    W --> Z
+    X --> Z
+
+============================================================
+2. FLUJO DE REGISTRO Y ACTIVACION DE CUENTA
+============================================================
+
+flowchart TD
+    A([Inicio]) --> B[Completar formulario de registro]
+    B --> C{¿Datos validos?}
+    C -- No --> D[Mostrar error]
+    D --> B
+    C -- Si --> E[(BDD: users / usuarios - crear cuenta)]
+    E --> F[Enviar email de alta]
+    F --> G[Crear sesion inicial o dejar cuenta lista]
+    G --> H([Fin: usuario registrado])
+
+============================================================
+3. FLUJO DE INICIO DE SESION
+============================================================
+
+flowchart TD
+    A([Inicio]) --> B[Ingresar email y clave]
+    B --> C[(BDD: consultar usuarios)]
+    C --> D{¿Credenciales correctas?}
+    D -- No --> E[Mostrar error]
+    E --> B
+    D -- Si --> F{¿Cuenta activa?}
+    F -- No --> G[Mostrar aviso de cuenta inactiva]
+    G --> B
+    F -- Si --> H[Iniciar sesion PHP]
+    H --> I[Guardar datos en $_SESSION]
+    I --> J{¿Rol del usuario?}
+    J -- Customer --> K[Ir a Home o Mi Cuenta]
+    J -- Admin --> L[Ir a panel Admin]
+    J -- CEO --> M[Ir a panel CEO]
+    K --> Z([Fin])
+    L --> Z
+    M --> Z
+
+============================================================
+4. FLUJO DE BUSQUEDA, FAVORITOS Y RESERVA DE VUELOS
+============================================================
+
+flowchart TD
+    A([Inicio]) --> B[Usuario entra a Vuelos]
+    B --> C[Completa filtros: origen, destino, fecha, aerolinea, precio, asientos, duracion]
+    C --> D[(BDD: consultar vuelos filtrados)]
+    D --> E[Mostrar resultados paginados]
+    E --> F{¿Hay resultados?}
+
+    F -- No --> G[Mostrar estado vacio / sugerencias]
+    G --> H{¿Cambia filtros?}
+    H -- Si --> C
+    H -- No --> Z([Fin: sin resultados])
+
+    F -- Si --> I[Revisar tarjetas de vuelo]
+    I --> J{¿Guardar favorito?}
+    I --> K{¿Reservar?}
+
+    J -- No --> K
+    J -- Si --> L{¿Usuario logueado?}
+    L -- No --> M[Redirigir a login]
+    L -- Si --> N[(BDD: insertar / quitar favorito)]
+    N --> I
+
+    K -- No --> O[Seguir explorando vuelos]
+    O --> E
+    K -- Si --> P{¿Usuario logueado?}
+    P -- No --> M
+    P -- Si --> Q[Ingresar cantidad de asientos]
+    Q --> R[(BDD: reservar asientos del vuelo)]
+    R --> S[(BDD: crear reserva en estado pendiente)]
+    S --> T[Enviar mail de reserva pendiente]
+    T --> U[Esperar aprobacion del CEO]
+    U --> Z([Fin])
+
+============================================================
+5. FLUJO DE CANCELACION DE RESERVA
+============================================================
+
+flowchart TD
+    A([Inicio]) --> B[Usuario entra a Mis Reservas]
+    B --> C[(BDD: consultar reservas del usuario)]
+    C --> D[Selecciona una reserva]
+    D --> E[(BDD: consultar vuelo asociado y fecha de salida)]
+    E --> F{¿Faltan mas de 72 horas?}
+    F -- No --> G[Mostrar error]
+    G --> B
+    F -- Si --> H[(BDD: actualizar reserva a cancelada)]
+    H --> I[(BDD: devolver asiento al vuelo)]
+    I --> J[Enviar confirmacion por email]
+    J --> K([Fin: cancelacion exitosa])
+
+============================================================
+6. FLUJO DE CONTACTO Y SOPORTE
+============================================================
+
+flowchart TD
+    A([Inicio]) --> B[Usuario entra a Contacto]
+    B --> C[Completa nombre, email, asunto y mensaje]
+    C --> D{¿Datos validos?}
+    D -- No --> E[Mostrar error y pedir correccion]
+    E --> C
+    D -- Si --> F[(BDD / log: registrar consulta o fallback local)]
+    F --> G[Enviar email a soporte]
+    G --> H[Mostrar confirmacion de envio]
+    H --> I{¿Quiere enviar otra consulta?}
+    I -- Si --> C
+    I -- No --> Z([Fin])
+
+============================================================
+7. FLUJO DE GESTION DE CUENTA Y PERFIL
+============================================================
+
+flowchart TD
+    A([Inicio]) --> B[Usuario entra a Mi Cuenta / Perfil]
+    B --> C{¿Sesion activa?}
+    C -- No --> D[Redirigir a login]
+    C -- Si --> E[(BDD: consultar usuario, reservas y actividad)]
+    E --> F[Mostrar datos personales y resumen de reservas]
+    F --> G{¿Quiere editar datos?}
+    F --> H{¿Quiere cambiar clave?}
+    F --> I{¿Quiere revisar reservas?}
+
+    G -- Si --> J[Ir a formulario de edicion]
+    J --> K[Validar nombre y email]
+    K --> L{¿Datos correctos?}
+    L -- No --> J
+    L -- Si --> M[(BDD: actualizar perfil)]
+    M --> F
+
+    H -- Si --> N[Ir a cambio de clave]
+    N --> O[Validar clave actual y nueva]
+    O --> P{¿Clave actual correcta?}
+    P -- No --> N
+    P -- Si --> Q[(BDD: actualizar password)]
+    Q --> F
+
+    I -- Si --> R[Entrar a Mis Reservas]
+    R --> S[Ver reservas vigentes e historial]
+    S --> T{¿Quiere cancelar una reserva?}
+    T -- Si --> U[Ir a flujo de cancelacion]
+    T -- No --> F
+
+    U --> Z([Fin])
+
+============================================================
+8. FLUJO DE NOTICIAS
+============================================================
+
+flowchart TD
+    A([Inicio]) --> B[Usuario entra a Novedades]
+    B --> C[(BDD: consultar novedades paginadas)]
+    C --> D[Mostrar lista de noticias]
+    D --> E{¿Quiere cambiar pagina?}
+    E -- Si --> F[Ir a pagina siguiente o anterior]
+    F --> C
+    E -- No --> G{¿Quiere volver al home?}
+    G -- Si --> H[Volver a inicio]
+    G -- No --> Z([Fin])
+
+============================================================
+9. FLUJO DEL PANEL ADMINISTRADOR
+============================================================
+
+flowchart TD
+    A([Inicio]) --> B[Admin inicia sesion y entra al panel]
+    B --> C[Ver resumen de aerolineas, promociones, novedades y solicitudes]
+    C --> D{¿Que desea gestionar?}
+
+    D -- Aerolineas --> E[ABMC de aerolineas]
+    D -- Promociones --> F[Revisar promociones pendientes]
+    D -- Novedades --> G[ABMC de novedades]
+    D -- Solicitudes de aerolinea --> H[Revisar propuestas de aerolinea]
+    D -- Solicitudes de vuelo --> I[Revisar solicitudes de vuelo]
+    D -- Reportes --> J[Exportar ventas CSV / ver resumen]
+
+    E --> E1[Crear / editar / eliminar aerolinea]
+    E1 --> C
+
+    F --> F1{¿Promocion valida?}
+    F1 -- No --> F2[(BDD: estado = denegada)]
+    F1 -- Si --> F3[(BDD: estado = aprobada)]
+    F2 --> C
+    F3 --> C
+
+    G --> G1[Crear / editar / eliminar novedades]
+    G1 --> C
+
+    H --> H1{¿Aprueba propuesta?}
+    H1 -- No --> H2[(BDD: propuesta denegada)]
+    H1 -- Si --> H3[(BDD: crear aerolinea y aprobar propuesta)]
+    H2 --> C
+    H3 --> C
+
+    I --> I1{¿Aprueba solicitud?}
+    I1 -- No --> I2[(BDD: solicitud de vuelo denegada)]
+    I1 -- Si --> I3[(BDD: crear vuelo y aprobar solicitud)]
+    I2 --> C
+    I3 --> C
+
+    J --> K[(BDD / CSV: generar reporte)]
+    K --> Z([Fin])
+
+============================================================
+10. FLUJO DEL PANEL CEO
+============================================================
+
+flowchart TD
+    A([Inicio]) --> B[CEO inicia sesion y entra al panel]
+    B --> C[Ver vuelos, promociones, solicitudes y reportes]
+    C --> D{¿Que accion realiza?}
+
+    D -- Solicitar vuelo --> E[Completar formulario de vuelo]
+    D -- Gestionar vuelos --> F[Editar o eliminar vuelos existentes]
+    D -- Crear promocion --> G[Completar promocion]
+    D -- Gestionar promociones --> H[Editar / activar / eliminar promociones]
+    D -- Proponer aerolinea --> I[Crear propuesta de aerolinea]
+    D -- Revisar reservas --> J[Ver reservas pendientes]
+    D -- Exportar reportes --> K[Descargar CSV de ventas / ocupacion]
+
+    E --> E1{¿Datos validos?}
+    E1 -- No --> E
+    E1 -- Si --> E2[(BDD: insertar solicitud de vuelo)]
+    E2 --> C
+
+    F --> F1{¿Editar o eliminar?}
+    F1 -- Editar --> F2[(BDD: actualizar vuelo)]
+    F1 -- Eliminar --> F3[(BDD: eliminar vuelo)]
+    F2 --> C
+    F3 --> C
+
+    G --> G1{¿Datos validos?}
+    G1 -- No --> G
+    G1 -- Si --> G2[(BDD: insertar promocion pendiente)]
+    G2 --> C
+
+    H --> H1[(BDD: actualizar promocion)]
+    H1 --> C
+
+    I --> I1{¿Datos validos?}
+    I1 -- No --> I
+    I1 -- Si --> I2[(BDD: insertar propuesta de aerolinea)]
+    I2 --> C
+
+    J --> J1{¿Aprueba o deniega?}
+    J1 -- Aprueba --> J2[(BDD: confirmar reserva y notificar)]
+    J1 -- Deniega --> J3[(BDD: denegar reserva y liberar asientos)]
+    J2 --> C
+    J3 --> C
+
+    K --> L[(CSV: reporte de ventas / ocupacion)]
+    L --> Z([Fin])
+
+============================================================
+FIN
+============================================================
