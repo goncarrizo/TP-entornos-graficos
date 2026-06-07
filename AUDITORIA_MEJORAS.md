@@ -6,14 +6,14 @@ Fecha: 7 de junio de 2026
 - [x] Implementar helper `app/helpers/csrf.php` con `csrf_token()` y `check_csrf()`.
 - [x] Incluir meta CSRF en `app/views/partials/header.php` y inyección automática en formularios POST (JS).
 - [x] Validar CSRF centralmente en `xampp_php/public/index.php` para todas las peticiones POST.
-- [ ] Migrar `md5()` a `password_hash()`/`password_verify()` y ampliar `users.password_hash` a `VARCHAR(255)`.
+- [x] Migrar `md5()` a `password_hash()`/`password_verify()` y ampliar `users.password_hash` a `VARCHAR(255)`.
 - [x] Configurar cookies de sesión seguras (`secure`, `httponly`, `SameSite`) en `app/config/config.php`.
 
 ## Alto
-- [ ] Añadir meta Open Graph y canonical en `app/views/partials/header.php`.
-- [ ] Generar `sitemap.xml` (estático o dinámico) y añadir `robots.txt` en `xampp_php/public/`.
-- [ ] Reemplazar imágenes críticas remotas por assets locales en `public/assets/images/`.
-- [ ] Optimizar imágenes (WebP/AVIF) y `preload` de fuentes críticas.
+- [x] Añadir meta Open Graph y canonical en `app/views/partials/header.php`.
+- [x] Generar `sitemap.xml` (estático o dinámico) y añadir `robots.txt` en `xampp_php/public/`.
+- [x] Reemplazar imágenes críticas remotas por assets locales en `public/assets/images/`.
+- [x] Optimizar imágenes (WebP/AVIF) y `preload` de fuentes críticas.
 
 ## Medio
 - [ ] Añadir `aria-live="polite"` en el contenedor de flash messages.
@@ -34,6 +34,10 @@ Fecha: 7 de junio de 2026
 - [x] Inyección de token en formularios POST mediante JS en `app/views/partials/footer.php`.
 - [x] Validación central CSRF en `xampp_php/public/index.php`.
 - [x] Configuración de cookies seguras en `app/config/config.php`.
+ - [x] Añadidos meta Open Graph y canonical en `app/views/partials/header.php`.
+ - [x] `sitemap.php`/`sitemap.xml` y `robots.txt` creados en `xampp_php/public`.
+ - [x] Imágenes criticas locales añadidas en `public/assets/images` (WebP/AVIF generadas).
+ - [x] Fuentes locales descargadas y preload implementado.
 
 ## Notas y próximos pasos
 - [ ] Migración segura de contraseñas (recomendado ejecutar en ventana de mantenimiento).
