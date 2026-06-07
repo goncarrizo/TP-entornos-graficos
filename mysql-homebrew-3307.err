@@ -1,0 +1,12 @@
+2026-06-07T20:14:31.481531Z 0 [System] [MY-015015] [Server] MySQL Server - start.
+2026-06-07T20:14:31.622559Z 0 [System] [MY-010116] [Server] /opt/homebrew/Cellar/mysql/9.6.0_3/bin/mysqld (mysqld 9.6.0) starting as process 58703
+2026-06-07T20:14:31.622674Z 0 [System] [MY-015590] [Server] MySQL Server has access to 10 logical CPUs.
+2026-06-07T20:14:31.622679Z 0 [System] [MY-015590] [Server] MySQL Server has access to 17179869184 bytes of physical memory.
+2026-06-07T20:14:31.626315Z 0 [Warning] [MY-010159] [Server] Setting lower_case_table_names=2 because file system for /opt/homebrew/var/mysql/ is case insensitive
+2026-06-07T20:14:31.633971Z 1 [System] [MY-013576] [InnoDB] InnoDB initialization has started.
+2026-06-07T20:14:31.887561Z 1 [System] [MY-013577] [InnoDB] InnoDB initialization has ended.
+2026-06-07T20:14:32.021066Z 0 [Warning] [MY-010068] [Server] CA certificate ca.pem is self signed.
+2026-06-07T20:14:32.021081Z 0 [System] [MY-013602] [Server] Channel mysql_main configured to support TLS. Encrypted connections are now supported for this channel.
+2026-06-07T20:14:32.022182Z 0 [Warning] [MY-011810] [Server] Insecure configuration for --pid-file: Location '/tmp' in the path is accessible to all OS users. Consider choosing a different directory.
+2026-06-07T20:14:32.030903Z 0 [System] [MY-011323] [Server] X Plugin ready for connections. Bind-address: '::' port: 33060, socket: /tmp/mysqlx.sock
+2026-06-07T20:14:32.030921Z 0 [System] [MY-010931] [Server] /opt/homebrew/Cellar/mysql/9.6.0_3/bin/mysqld: ready for connections. Version: '9.6.0'  socket: '/tmp/mysql-3307.sock'  port: 3307  Homebrew.

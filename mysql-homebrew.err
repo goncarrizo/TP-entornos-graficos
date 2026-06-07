@@ -1,0 +1,14 @@
+2026-06-07T20:14:09.059407Z 0 [System] [MY-015015] [Server] MySQL Server - start.
+2026-06-07T20:14:09.201444Z 0 [System] [MY-010116] [Server] /opt/homebrew/Cellar/mysql/9.6.0_3/bin/mysqld (mysqld 9.6.0) starting as process 56834
+2026-06-07T20:14:09.201559Z 0 [System] [MY-015590] [Server] MySQL Server has access to 10 logical CPUs.
+2026-06-07T20:14:09.201563Z 0 [System] [MY-015590] [Server] MySQL Server has access to 17179869184 bytes of physical memory.
+2026-06-07T20:14:09.205416Z 0 [Warning] [MY-010159] [Server] Setting lower_case_table_names=2 because file system for /opt/homebrew/var/mysql/ is case insensitive
+2026-06-07T20:14:09.213355Z 1 [System] [MY-013576] [InnoDB] InnoDB initialization has started.
+2026-06-07T20:14:09.377593Z 1 [System] [MY-013577] [InnoDB] InnoDB initialization has ended.
+2026-06-07T20:14:09.515142Z 0 [Warning] [MY-010068] [Server] CA certificate ca.pem is self signed.
+2026-06-07T20:14:09.515259Z 0 [System] [MY-013602] [Server] Channel mysql_main configured to support TLS. Encrypted connections are now supported for this channel.
+2026-06-07T20:14:09.516395Z 0 [ERROR] [MY-010262] [Server] Can't start server: Bind on TCP/IP port: Address already in use
+2026-06-07T20:14:09.516426Z 0 [ERROR] [MY-010257] [Server] Do you already have another mysqld server running on port: 3306 ?
+2026-06-07T20:14:09.516440Z 0 [ERROR] [MY-010119] [Server] Aborting
+2026-06-07T20:14:10.536230Z 0 [System] [MY-010910] [Server] /opt/homebrew/Cellar/mysql/9.6.0_3/bin/mysqld: Shutdown complete (mysqld 9.6.0)  Homebrew.
+2026-06-07T20:14:10.536243Z 0 [System] [MY-015016] [Server] MySQL Server - end.

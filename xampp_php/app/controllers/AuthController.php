@@ -79,6 +79,7 @@ class AuthController
             'email' => $user['email'],
             'role' => $user['role'],
             'rol' => $user['role'],
+            'user_icon' => $user['user_icon'] ?? null,
         ];
 
         // Claves pedidas de forma explicita en consigna academica.
@@ -135,8 +136,54 @@ class AuthController
         redirect_to('profile');
     }
 
+    public static function updateIcon(): void
+    {
+        require_login();
+
+        $user = current_user();
+        $userId = (int) ($user['id'] ?? 0);
+
+        $icon = clean_text((string) ($_POST['user_icon'] ?? ''));
+
+        $allowed = [
+            'plane',
+            'ticket',
+            'map',
+            'shield',
+            'star',
+            'heart',
+            'user',
+            'globe',
+        ];
+
+        if ($userId < 1) {
+            flash('error', 'Usuario invalido.');
+            redirect_to('account_edit');
+        }
+
+        if ($icon !== '' && !in_array($icon, $allowed, true)) {
+            flash('error', 'Icono invalido.');
+            redirect_to('account_edit');
+        }
+
+        // Permite vaciar el icono si llega ''
+        $iconKey = $icon !== '' ? $icon : null;
+
+        if (!User::updateIcon($userId, $iconKey)) {
+            flash('error', 'No se pudo actualizar el icono.');
+            redirect_to('account_edit');
+        }
+
+        $_SESSION['user']['user_icon'] = $iconKey;
+
+        // Asegura que navbar/profile reflejen el cambio en la sesion actual.
+        flash('ok', 'Icono actualizado correctamente.');
+        redirect_to('account_edit');
+    }
+
     public static function changePassword(): void
     {
+
         require_login();
 
         $user = current_user();

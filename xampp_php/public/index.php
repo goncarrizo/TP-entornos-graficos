@@ -32,6 +32,9 @@ if ($action) {
             case 'change_password':
                 AuthController::changePassword();
                 break;
+            case 'update_icon':
+                AuthController::updateIcon();
+                break;
             case 'contact_submit':
                 SiteController::contactSubmit();
                 break;

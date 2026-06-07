@@ -14,7 +14,7 @@ class User
 
     public static function findById(int $id): ?array
     {
-        $sql = 'SELECT id, name, email, role, email_verified FROM users WHERE id = :id LIMIT 1';
+        $sql = 'SELECT id, name, email, role, email_verified, user_icon FROM users WHERE id = :id LIMIT 1';
         $stmt = Database::connection()->prepare($sql);
         $stmt->execute(['id' => $id]);
         $row = $stmt->fetch();
@@ -78,4 +78,16 @@ class User
             'password_hash' => $passwordHash,
         ]);
     }
+
+    public static function updateIcon(int $id, ?string $iconKey): bool
+    {
+        $sql = 'UPDATE users SET user_icon = :user_icon WHERE id = :id';
+        $stmt = Database::connection()->prepare($sql);
+
+        return $stmt->execute([
+            'id' => $id,
+            'user_icon' => $iconKey,
+        ]);
+    }
 }
+

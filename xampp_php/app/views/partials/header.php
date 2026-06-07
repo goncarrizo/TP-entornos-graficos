@@ -41,6 +41,10 @@
     }
   ?>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="<?php echo BASE_URL; ?>/assets/css/styles.css">
+  <?php
+    $stylePath = __DIR__ . '/../../../public/assets/css/styles.css';
+    $styleVersion = is_file($stylePath) ? (string) filemtime($stylePath) : '1';
+  ?>
+  <link rel="stylesheet" href="<?php echo BASE_URL; ?>/assets/css/styles.css?v=<?php echo htmlspecialchars($styleVersion); ?>">
 </head>
 <body data-page="<?php echo htmlspecialchars($_GET['page'] ?? 'home'); ?>">

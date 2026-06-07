@@ -17,6 +17,11 @@ function redirect_to(string $page): void
 
 function flash(string $key, ?string $value = null): ?string
 {
+    // Aseguramos que flash exista como array para evitar "null as an array offset"
+    if (!isset($_SESSION['flash']) || !is_array($_SESSION['flash'])) {
+        $_SESSION['flash'] = [];
+    }
+
     if ($value !== null) {
         $_SESSION['flash'][$key] = $value;
         return null;

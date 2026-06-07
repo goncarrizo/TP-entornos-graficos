@@ -12,6 +12,7 @@ CREATE TABLE users (
   password_hash VARCHAR(255) NOT NULL,
   role ENUM('admin', 'ceo', 'customer') NOT NULL DEFAULT 'customer',
   email_verified TINYINT(1) NOT NULL DEFAULT 0,
+  user_icon VARCHAR(64) NULL DEFAULT NULL,
   last_login_at DATETIME NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
