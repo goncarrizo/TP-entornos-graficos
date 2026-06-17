@@ -1,22 +1,61 @@
 </main>
-<footer class="site-footer mt-4">
-  <div class="container py-3 d-flex flex-column flex-md-row justify-content-between gap-2">
-    <div>
-      <strong>AirARG</strong>
-      <div class="small">Reservas, rutas y gestion operativa</div>
+<footer class="site-footer mt-4" role="contentinfo">
+  <div class="container py-4">
+    <div class="row">
+      <!-- Sección de marca -->
+      <div class="col-12 col-md-4 mb-4 mb-md-0">
+        <div class="footer-brand">
+          <strong class="d-block mb-2">AirARG</strong>
+          <p class="text-muted small mb-0">Plataforma integral de reservas, rutas y gestión operativa de vuelos.</p>
+        </div>
+      </div>
+      
+      <!-- Navegación principal -->
+      <div class="col-12 col-md-4 mb-4 mb-md-0">
+        <h3 class="footer-title">Navegación</h3>
+        <nav aria-label="Pie de página - Navegación">
+          <ul class="list-unstyled small">
+            <li><a href="<?php echo BASE_URL; ?>/index.php?page=home">Home</a></li>
+            <li><a href="<?php echo BASE_URL; ?>/index.php?page=flights">Vuelos</a></li>
+            <li><a href="<?php echo BASE_URL; ?>/index.php?page=news">Novedades</a></li>
+            <li><a href="<?php echo BASE_URL; ?>/index.php?page=faq">Ayuda</a></li>
+            <li><a href="<?php echo BASE_URL; ?>/index.php?page=contact">Contacto</a></li>
+          </ul>
+        </nav>
+      </div>
+      
+      <!-- Cuenta y Legal -->
+      <div class="col-12 col-md-4">
+        <h3 class="footer-title">Cuenta</h3>
+        <nav aria-label="Pie de página - Cuenta">
+          <ul class="list-unstyled small">
+            <li><a href="<?php echo BASE_URL; ?>/index.php?page=login">Ingresar</a></li>
+            <li><a href="<?php echo BASE_URL; ?>/index.php?page=register">Registrarse</a></li>
+            <li><a href="<?php echo BASE_URL; ?>/index.php?page=profile">Mi Perfil</a></li>
+            <li><a href="<?php echo BASE_URL; ?>/index.php?page=reservations">Mis Reservas</a></li>
+          </ul>
+        </nav>
+      </div>
     </div>
-    <div class="d-flex flex-wrap gap-3 small">
-      <a href="<?php echo BASE_URL; ?>/index.php?page=home">Home</a>
-      <a href="<?php echo BASE_URL; ?>/index.php?page=flights">Vuelos</a>
-      <a href="<?php echo BASE_URL; ?>/index.php?page=news">Novedades</a>
-      <a href="<?php echo BASE_URL; ?>/index.php?page=faq">Ayuda</a>
-      <a href="<?php echo BASE_URL; ?>/index.php?page=contact">Contacto</a>
-      <a href="<?php echo BASE_URL; ?>/index.php?page=login">Ingresar</a>
-      <a href="<?php echo BASE_URL; ?>/index.php?page=register">Registrarse</a>
-      <a href="<?php echo BASE_URL; ?>/index.php?page=profile">Cuenta</a>
-      <a href="<?php echo BASE_URL; ?>/index.php?page=reservations">Reservas</a>
-      <a href="<?php echo BASE_URL; ?>/index.php?page=admin">Panel Admin</a>
-      <a href="<?php echo BASE_URL; ?>/index.php?page=ceo">Panel CEO</a>
+    
+    <!-- Línea divisoria -->
+    <hr class="my-4">
+    
+    <!-- Legal y accesibilidad -->
+    <div class="row">
+      <div class="col-12">
+        <nav class="d-flex flex-wrap gap-3 justify-content-between align-items-center small" aria-label="Pie de página - Información legal">
+          <div class="footer-legal">
+            <span>&copy; 2026 AirARG. Todos los derechos reservados.</span>
+          </div>
+          <div class="d-flex gap-3">
+            <a href="<?php echo BASE_URL; ?>/index.php?page=sitemap">Mapa del sitio</a>
+            <a href="<?php echo BASE_URL; ?>/index.php?page=home#accesibilidad">Accesibilidad</a>
+            <a href="<?php echo BASE_URL; ?>/index.php?page=home#privacidad">Privacidad</a>
+            <a href="<?php echo BASE_URL; ?>/index.php?page=home#terminos">Términos</a>
+          </div>
+        </nav>
+      </div>
     </div>
   </div>
 </footer>

@@ -1259,3 +1259,203 @@ h3,
     background-attachment: fixed;
   }
 }
+
+/* ===== FOOTER MEJORADO (Accesibilidad & Estructura) ===== */
+.site-footer {
+  background: linear-gradient(180deg, var(--surface) 0%, #f5f9fc 100%);
+  border-top: 1px solid var(--surface-border);
+  margin-top: auto;
+}
+
+.site-footer a {
+  color: var(--text-soft);
+  text-decoration: none;
+  transition: color var(--dur-fast) var(--ease-standard);
+}
+
+.site-footer a:hover {
+  color: var(--brand);
+  text-decoration: underline;
+}
+
+.site-footer a:focus-visible {
+  outline: 3px solid var(--brand);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.footer-brand {
+  padding-right: 2rem;
+}
+
+.footer-title {
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text);
+  margin-bottom: 1rem;
+}
+
+.footer-title + nav ul li {
+  margin-bottom: 0.5rem;
+}
+
+.footer-legal {
+  color: var(--text-soft);
+  font-size: 0.8125rem;
+}
+
+/* ===== MEJORAS GLOBALES DE ACCESIBILIDAD ===== */
+
+/* Foco visible mejorado */
+:focus-visible {
+  outline: 3px solid var(--brand);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* Quitar outline predeterminado pero mantener accesibilidad */
+button:focus,
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid var(--brand);
+  outline-offset: 3px;
+}
+
+/* Skip link - accesible pero oculto */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: var(--brand);
+  color: white;
+  padding: 8px 12px;
+  text-decoration: none;
+  z-index: 100;
+  border-radius: 0 0 4px 0;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.skip-link:focus-visible {
+  top: 0;
+  outline: none;
+}
+
+/* Form labels consistency */
+.form-label {
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.form-label::after {
+  content: "";
+}
+
+.form-label.required::after {
+  content: " *";
+  color: var(--accent);
+  aria-label: "requerido";
+}
+
+/* Mensajes de error accesibles */
+.invalid-feedback,
+.invalid-tooltip {
+  display: block;
+  font-size: 0.875rem;
+  color: var(--accent);
+  margin-top: 0.25rem;
+  font-weight: 500;
+}
+
+/* Flash messages con ARIA live */
+.alert {
+  animation: alertIn var(--dur-medium) var(--ease-standard);
+}
+
+.flash-inline {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border-left: 4px solid currentColor;
+}
+
+.flash-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.alert-success .flash-badge {
+  background: rgba(40, 167, 69, 0.15);
+  color: #1c5a3f;
+}
+
+.alert-danger .flash-badge {
+  background: rgba(220, 53, 69, 0.15);
+  color: #721c24;
+}
+
+.alert-info .flash-badge {
+  background: rgba(23, 162, 184, 0.15);
+  color: #0c5460;
+}
+
+/* Mejora de navegación por teclado */
+.navbar-nav .nav-link:focus-visible {
+  outline: 3px solid var(--brand);
+  outline-offset: 2px;
+}
+
+.dropdown-item:focus-visible {
+  outline: 3px solid var(--brand);
+  outline-offset: -2px;
+}
+
+/* Breadcrumb accesible */
+.breadcrumb-air {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.breadcrumb-air a {
+  color: var(--brand);
+}
+
+.breadcrumb-air [aria-current="page"] {
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* Dark mode support (opcional para futuro) */
+@media (prefers-color-scheme: dark) {
+  body {
+    --text: #f4f8ff;
+    --text-soft: #cbd2db;
+    --surface: #1a2332;
+    --surface-border: #2d3d4d;
+    --bg-top: #0f1820;
+    --bg-bottom: #1a2735;
+  }
+}
+

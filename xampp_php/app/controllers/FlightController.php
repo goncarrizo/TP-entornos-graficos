@@ -82,8 +82,32 @@ class FlightController
             'submitted_by' => (int) current_user()['id'],
         ];
 
-        if ($data['airline_id'] < 1 || $data['origin'] === '' || $data['destination'] === '' || $data['departure_time'] === '' || $data['arrival_time'] === '' || $data['price'] <= 0 || $data['total_seats'] < 1) {
-            flash('error', 'Datos invalidos para solicitar un nuevo vuelo.');
+        if ($data['airline_id'] < 1) {
+            flash('error', 'Error: Selecciona una aerolínea válida.');
+            redirect_to('ceo');
+        }
+        if ($data['origin'] === '') {
+            flash('error', 'Error: El campo Origen es obligatorio.');
+            redirect_to('ceo');
+        }
+        if ($data['destination'] === '') {
+            flash('error', 'Error: El campo Destino es obligatorio.');
+            redirect_to('ceo');
+        }
+        if ($data['departure_time'] === '') {
+            flash('error', 'Error: Ingresa la fecha y hora de salida.');
+            redirect_to('ceo');
+        }
+        if ($data['arrival_time'] === '') {
+            flash('error', 'Error: Ingresa la fecha y hora de llegada.');
+            redirect_to('ceo');
+        }
+        if ($data['price'] <= 0) {
+            flash('error', 'Error: El precio debe ser mayor a 0.');
+            redirect_to('ceo');
+        }
+        if ($data['total_seats'] < 1) {
+            flash('error', 'Error: La cantidad de asientos totales debe ser al menos 1.');
             redirect_to('ceo');
         }
 
@@ -117,8 +141,24 @@ class FlightController
             'total_seats' => int_value($_POST['total_seats'] ?? 0),
         ];
 
-        if ($id < 1 || $data['airline_id'] < 1 || $data['origin'] === '' || $data['destination'] === '' || $data['total_seats'] < 1) {
-            flash('error', 'Datos invalidos para actualizar vuelo.');
+        if ($id < 1) {
+            flash('error', 'Error: Vuelo no válido.');
+            redirect_to('ceo');
+        }
+        if ($data['airline_id'] < 1) {
+            flash('error', 'Error: Selecciona una aerolínea válida.');
+            redirect_to('ceo');
+        }
+        if ($data['origin'] === '') {
+            flash('error', 'Error: El campo Origen es obligatorio.');
+            redirect_to('ceo');
+        }
+        if ($data['destination'] === '') {
+            flash('error', 'Error: El campo Destino es obligatorio.');
+            redirect_to('ceo');
+        }
+        if ($data['total_seats'] < 1) {
+            flash('error', 'Error: La cantidad de asientos totales debe ser al menos 1.');
             redirect_to('ceo');
         }
 
