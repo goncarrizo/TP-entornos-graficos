@@ -172,17 +172,17 @@ De `AUDITORIA_MEJORAS.md` (ya ✅):
 
 ## 4) Resumen en formato “Checklist accionable”
 ### Pendientes principales (accesibilidad)
-- [x] Skip link a `main#contenido-principal`
-- [x] Landmarks semánticos (`header/nav/main/footer`)
+- [ ] Skip link a `main#contenido-principal`
+- [ ] Landmarks semánticos (`header/nav/main/footer`)
 - [ ] Foco visible consistente (evitar `outline: none` sin reemplazo) + ordenar tab
-- [x] aria-live para flash messages
-- [x] Formularios: labels asociados + errores específicos y anunciados
+- [ ] aria-live para flash messages
+- [ ] Formularios: labels asociados + errores específicos y anunciados
 - [ ] ALT correcto para imágenes (y `alt=""` decorativas)
 - [ ] Contraste 4.5:1 en texto + estados de error sin depender solo del color
-- [x] `html lang="es"`
+- [ ] `html lang="es"`
 - [ ] Links descriptivos
 - [ ] Verificar zoom 200% y responsive sin romper layout
-- [x] Breadcrumbs + mapa del sitio link en footer (según AirARG)
+- [ ] Breadcrumbs + mapa del sitio link en footer (según AirARG)
 
 ### Pendientes secundarios (si existe multimedia)
 - [ ] Verificar subtítulos/transcripción y control de reproducción

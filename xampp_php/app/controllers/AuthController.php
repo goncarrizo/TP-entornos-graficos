@@ -17,32 +17,8 @@ class AuthController
 
         $passwordsMatch = $password !== '' && $password === $passwordConfirm;
 
-        if (!valid_name($name)) {
-            flash('error', 'Error en Nombre: Por favor ingresa un nombre válido.');
-            redirect_to('register');
-        }
-        if (!valid_name($lastname)) {
-            flash('error', 'Error en Apellido: Por favor ingresa un apellido válido.');
-            redirect_to('register');
-        }
-        if (!valid_email($email)) {
-            flash('error', 'Error en Email: Por favor ingresa un correo electrónico válido.');
-            redirect_to('register');
-        }
-        if (!valid_phone($phone)) {
-            flash('error', 'Error en Teléfono: Por favor ingresa un número de teléfono válido.');
-            redirect_to('register');
-        }
-        if (!valid_document($document)) {
-            flash('error', 'Error en Documento: Por favor ingresa un número de documento válido.');
-            redirect_to('register');
-        }
-        if (!valid_birthdate($birthdate)) {
-            flash('error', 'Error en Fecha de Nacimiento: Por favor ingresa una fecha válida.');
-            redirect_to('register');
-        }
-        if (!valid_password($password) || !$passwordsMatch) {
-            flash('error', 'Error en Contraseña: La contraseña no cumple con los requisitos o no coinciden.');
+        if (!valid_name($name) || !valid_name($lastname) || !valid_email($email) || !valid_phone($phone) || !valid_document($document) || !valid_birthdate($birthdate) || !valid_password($password) || !$passwordsMatch) {
+            flash('error', 'Revisa los datos del registro antes de continuar.');
             redirect_to('register');
         }
 
@@ -138,12 +114,8 @@ class AuthController
         $name = clean_text($_POST['name'] ?? '');
         $email = clean_email($_POST['email'] ?? '');
 
-        if (!valid_name($name)) {
-            flash('error', 'Error en Nombre: Por favor ingresa un nombre válido.');
-            redirect_to('profile');
-        }
-        if (!valid_email($email)) {
-            flash('error', 'Error en Email: Por favor ingresa un correo electrónico válido.');
+        if (!valid_name($name) || !valid_email($email)) {
+            flash('error', 'Revisa los datos de tu cuenta.');
             redirect_to('profile');
         }
 
@@ -222,12 +194,8 @@ class AuthController
         $newPassword = (string) ($_POST['new_password'] ?? '');
         $confirmPassword = (string) ($_POST['confirm_password'] ?? '');
 
-        if (!valid_password($currentPassword)) {
-            flash('error', 'Error en Clave Actual: La clave ingresada no tiene un formato válido.');
-            redirect_to('profile');
-        }
-        if (!valid_password($newPassword) || $newPassword !== $confirmPassword) {
-            flash('error', 'Error en Nueva Clave: La clave no cumple con los requisitos o no coincide con la confirmación.');
+        if (!valid_password($currentPassword) || !valid_password($newPassword) || $newPassword !== $confirmPassword) {
+            flash('error', 'Revisa los datos de cambio de clave.');
             redirect_to('profile');
         }
 

@@ -9,20 +9,8 @@ class SiteController
         $subject = clean_text($_POST['subject'] ?? '');
         $message = clean_text($_POST['message'] ?? '');
 
-        if (!valid_name($name)) {
-            flash('error', 'Error en Nombre: Por favor ingresa un nombre válido.');
-            redirect_to('contact');
-        }
-        if (!valid_email($email)) {
-            flash('error', 'Error en Email: Ingresa un correo electrónico válido.');
-            redirect_to('contact');
-        }
-        if (strlen($subject) < 4) {
-            flash('error', 'Error en Asunto: El asunto debe tener al menos 4 caracteres.');
-            redirect_to('contact');
-        }
-        if (strlen($message) < 10) {
-            flash('error', 'Error en Mensaje: El mensaje debe tener al menos 10 caracteres.');
+        if (!valid_name($name) || !valid_email($email) || strlen($subject) < 4 || strlen($message) < 10) {
+            flash('error', 'Revisa los datos del formulario de contacto.');
             redirect_to('contact');
         }
 

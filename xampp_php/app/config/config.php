@@ -25,9 +25,7 @@ function normalize_base_url(string $path): string
     return $path === '/' ? '' : $path;
 }
 
-// The base path should be the directory containing the front controller (public/).
-// The fallback is for CLI context and assumes a standard project structure.
-$basePath = normalize_base_url(dirname($_SERVER['SCRIPT_NAME'] ?? '/TP-entornos-graficos/xampp_php/public/index.php'));
+$basePath = normalize_base_url(dirname($_SERVER['SCRIPT_NAME'] ?? '/xampp_php/public'));
 define('BASE_URL', $basePath);
 // Use environment variables when available (for Docker / cloud deploys)
 define('DB_HOST', getenv('DB_HOST') !== false ? getenv('DB_HOST') : '127.0.0.1');
