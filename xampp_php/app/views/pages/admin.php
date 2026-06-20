@@ -9,6 +9,7 @@
   <span class="status-badge success">Novedades: <?php echo count($news); ?></span>
     <span class="status-badge secondary">Propuestas de aerolinea: <?php echo count($pendingAirlineRequests); ?></span>
     <span class="status-badge secondary">Solicitudes de vuelo: <?php echo count($pendingFlightRequests); ?></span>
+    <span class="status-badge secondary">CEOs pendientes: <?php echo count($pendingCEOs ?? []); ?></span>
     <div class="card p-3">
       <h2 id="airlines-admin-title" class="h5">1) ABMC Aerolineas</h2>
       <form class="row g-2 needs-validation mb-3" method="post" action="<?php echo BASE_URL; ?>/index.php?page=admin" novalidate>
@@ -60,6 +61,43 @@
               <button class="btn btn-sm btn-secondary" name="action" value="deny_airline_request" type="submit">Denegar</button>
             </div>
           </form>
+        <?php endforeach; ?>
+      <?php endif; ?>
+    </div>
+  </section>
+
+  <section class="col-lg-6" aria-labelledby="pending-ceos-admin-title">
+    <div class="card p-3">
+      <h2 id="pending-ceos-admin-title" class="h5">CEOs Pendientes de Aprobación</h2>
+      <?php if (empty($pendingCEOs)): ?>
+        <div class="empty-state compact">
+          <p class="mb-0">No hay CEOs pendientes de aprobación.</p>
+        </div>
+      <?php else: ?>
+        <?php foreach ($pendingCEOs as $ceo): ?>
+          <div class="border rounded p-2 mb-2">
+            <div class="d-flex justify-content-between align-items-start gap-2">
+              <div>
+                <strong><?php echo htmlspecialchars($ceo['name']); ?></strong>
+                <div class="small text-muted"><?php echo htmlspecialchars($ceo['email']); ?></div>
+                <div class="small text-muted">Aerolinea: <?php echo htmlspecialchars($ceo['airline_name'] ?? 'Sin asignar'); ?></div>
+                <div class="small text-muted">Documento: <?php echo htmlspecialchars($ceo['document_number'] ?? 'No especificado'); ?></div>
+                <div class="small text-muted">Solicitado: <?php echo htmlspecialchars(date('d/m/Y H:i', strtotime($ceo['created_at']))); ?></div>
+              </div>
+              <div class="d-flex gap-2 flex-column">
+                <form method="post" action="<?php echo BASE_URL; ?>/index.php?page=admin" style="margin: 0;">
+                  <input type="hidden" name="action" value="approve_ceo">
+                  <input type="hidden" name="ceo_id" value="<?php echo (int) $ceo['id']; ?>">
+                  <button class="btn btn-sm btn-success w-100" type="submit">Aprobar</button>
+                </form>
+                <form method="post" action="<?php echo BASE_URL; ?>/index.php?page=admin" style="margin: 0;">
+                  <input type="hidden" name="action" value="reject_ceo">
+                  <input type="hidden" name="ceo_id" value="<?php echo (int) $ceo['id']; ?>">
+                  <button class="btn btn-sm btn-danger w-100" type="submit">Rechazar</button>
+                </form>
+              </div>
+            </div>
+          </div>
         <?php endforeach; ?>
       <?php endif; ?>
     </div>
@@ -139,6 +177,10 @@
         <input type="hidden" name="action" value="create_news">
         <div class="mb-2"><label class="form-label" for="news_title">Titulo</label><input id="news_title" name="title" class="form-control" required></div>
         <div class="mb-2"><label class="form-label" for="news_content">Contenido</label><textarea id="news_content" name="content" class="form-control" rows="3" required></textarea></div>
+        <div class="row g-2 mb-2">
+          <div class="col-md-6"><label class="form-label" for="news_start">Fecha inicio</label><input id="news_start" name="start_date" type="date" class="form-control"></div>
+          <div class="col-md-6"><label class="form-label" for="news_end">Fecha fin</label><input id="news_end" name="end_date" type="date" class="form-control"></div>
+        </div>
         <button class="btn btn-primary" type="submit">Publicar</button>
       </form>
 
@@ -152,6 +194,10 @@
             <input type="hidden" name="news_id" value="<?php echo (int) $item['id']; ?>">
             <input name="title" class="form-control mb-2" value="<?php echo htmlspecialchars($item['title']); ?>" required>
             <textarea name="content" class="form-control mb-2" rows="3" required><?php echo htmlspecialchars($item['content']); ?></textarea>
+            <div class="row g-2 mb-2">
+              <div class="col-md-6"><label class="form-label" for="news_start_<?php echo (int) $item['id']; ?>">Fecha inicio</label><input id="news_start_<?php echo (int) $item['id']; ?>" name="start_date" type="date" class="form-control" value="<?php echo htmlspecialchars($item['start_date'] ?? ''); ?>"></div>
+              <div class="col-md-6"><label class="form-label" for="news_end_<?php echo (int) $item['id']; ?>">Fecha fin</label><input id="news_end_<?php echo (int) $item['id']; ?>" name="end_date" type="date" class="form-control" value="<?php echo htmlspecialchars($item['end_date'] ?? ''); ?>"></div>
+            </div>
             <div class="d-flex gap-2">
               <button class="btn btn-sm btn-warning" name="action" value="update_news" type="submit">Editar</button>
               <button class="btn btn-sm btn-danger" name="action" value="delete_news" type="submit">Eliminar</button>

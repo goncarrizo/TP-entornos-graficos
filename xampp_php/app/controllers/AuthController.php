@@ -12,6 +12,7 @@ class AuthController
         $birthdate = (string) ($_POST['birthdate'] ?? '');
         $password = (string) ($_POST['password'] ?? '');
         $passwordConfirm = (string) ($_POST['password_confirm'] ?? '');
+        $role = clean_text($_POST['role'] ?? 'customer');
 
         $fullName = trim($name . ' ' . $lastname);
 
@@ -56,13 +57,42 @@ class AuthController
 
         // Use password_hash (bcrypt/argon2 depending on PHP) for secure password storage.
         $hash = password_hash($password, PASSWORD_DEFAULT);
-        User::create($fullName, $email, $phone, $document, $birthdate, $hash);
 
-        $mailSent = send_app_mail($email, 'Registro AirARG', "Hola $fullName, tu cuenta fue creada correctamente.");
-        if ($mailSent) {
-            flash('ok', 'Registro exitoso. Ya podes iniciar sesion.');
+        $airlineId = null;
+        $isApproved = true;
+
+        if ($role === 'ceo') {
+            $airlineId = int_value($_POST['airline_id'] ?? 0);
+            if ($airlineId < 1) {
+                flash('error', 'Selecciona la aerolinea para el CEO.');
+                redirect_to('register');
+            }
+            if (!Airline::findById($airlineId)) {
+                flash('error', 'Aerolinea invalida para CEO.');
+                redirect_to('register');
+            }
+            if (User::findByAirlineAndRole($airlineId, 'ceo')) {
+                flash('error', 'Ya existe un CEO asignado a esa aerolinea.');
+                redirect_to('register');
+            }
+            // CEOs created by non-admins require approval
+            $isApproved = is_logged_in() && has_role('admin');
+        } else if ($role !== 'customer') {
+            // Only customer or ceo roles allowed for registration
+            $role = 'customer';
+        }
+
+        User::create($fullName, $email, $phone, $document, $birthdate, $hash, $role, $airlineId, $isApproved);
+
+        if ($role === 'ceo' && !$isApproved) {
+            flash('ok', 'Solicitud de CEO enviada. Debes esperar la aprobación del administrador para acceder.');
         } else {
-            flash('ok', 'Registro exitoso. Ya podes iniciar sesion. El correo de bienvenida no pudo enviarse desde este entorno.');
+            $mailSent = send_app_mail($email, 'Registro AirARG', "Hola $fullName, tu cuenta fue creada correctamente.");
+            if ($mailSent) {
+                flash('ok', 'Registro exitoso. Ya podes iniciar sesion.');
+            } else {
+                flash('ok', 'Registro exitoso. Ya podes iniciar sesion. El correo de bienvenida no pudo enviarse desde este entorno.');
+            }
         }
 
         redirect_to('login');
@@ -104,6 +134,12 @@ class AuthController
             redirect_to('login');
         }
 
+        // Block unapproved CEOs
+        if ($user['role'] === 'ceo' && !(int) ($user['is_approved'] ?? 1)) {
+            flash('error', 'Tu cuenta de CEO aun no ha sido aprobada por el administrador.');
+            redirect_to('login');
+        }
+
         $_SESSION['user'] = [
             'id_usuario' => (int) $user['id'],
             'id' => (int) $user['id'],
@@ -112,6 +148,7 @@ class AuthController
             'email' => $user['email'],
             'role' => $user['role'],
             'rol' => $user['role'],
+            'airline_id' => $user['airline_id'] ?? null,
             'user_icon' => $user['user_icon'] ?? null,
         ];
 
@@ -135,6 +172,49 @@ class AuthController
         session_start();
         flash('ok', 'Sesion cerrada correctamente.');
         redirect_to('home');
+    }
+
+    public static function requestPasswordReset(): void
+    {
+        $email = clean_email($_POST['email'] ?? '');
+        if (!valid_email($email)) {
+            flash('error', 'Ingresa un email valido para recuperar la clave.');
+            redirect_to('login');
+        }
+
+        $user = User::findByEmail($email);
+        if (!$user) {
+            // No revelar si el email existe para mayor seguridad.
+            flash('ok', 'Si el email existe en el sistema, recibirás una clave temporal en tu correo.');
+            redirect_to('login');
+        }
+
+        if ($user['role'] === 'ceo' && !(int) ($user['is_approved'] ?? 1)) {
+            flash('error', 'Tu cuenta de CEO aun no ha sido aprobada. No es posible restablecer la clave hasta que el administrador la apruebe.');
+            redirect_to('login');
+        }
+
+        $temporaryPassword = bin2hex(random_bytes(5));
+        $hashedTempPassword = password_hash($temporaryPassword, PASSWORD_DEFAULT);
+        if (!User::updatePassword((int) $user['id'], $hashedTempPassword)) {
+            flash('error', 'No se pudo procesar la solicitud de restablecimiento. Intenta de nuevo mas tarde.');
+            redirect_to('login');
+        }
+
+        $message = "Hola {$user['name']},\n\n" .
+            "Se solicitó recuperar la contraseña de tu cuenta. Tu nueva clave temporal es:\n\n" .
+            "$temporaryPassword\n\n" .
+            "Usa esta clave para iniciar sesión y luego cambia tu contraseña desde tu perfil.\n\n" .
+            "Si no solicitaste este cambio, ignora este correo.";
+        $mailSent = send_app_mail($email, 'Recuperacion de contraseña AirARG', $message);
+
+        if ($mailSent) {
+            flash('ok', 'Se envió una clave temporal a tu correo. Revisa tu bandeja y luego inicia sesión.');
+        } else {
+            flash('error', 'No se pudo enviar el correo de recuperación. Contacta al administrador o intenta nuevamente.');
+        }
+
+        redirect_to('login');
     }
 
     public static function updateProfile(): void

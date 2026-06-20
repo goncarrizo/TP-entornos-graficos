@@ -53,9 +53,13 @@ sudo cp -R /Users/joa/TP-entornos-graficos/xampp_php /Applications/XAMPP/xamppfi
 
 ## Usuarios de prueba
 
-- admin@tp.com / 123456
-- ceo@tp.com / 123456
-- cliente@tp.com / 123456
+- admin@tp.com / 123456  (rol: admin)
+- ceo@tp.com / 123456  (rol: ceo, aerolínea: Andes Airlines)
+- cliente@tp.com / 123456  (rol: customer)
+- ceo.andes@demo.com / Demo123456  (rol: ceo, aerolínea: Andes Airlines)
+- ceo.pampa@demo.com / Demo123456  (rol: ceo, aerolínea: Pampa Fly)
+
+> Las cuentas `ceo.andes@demo.com` y `ceo.pampa@demo.com` se crean con el script/demo web de generación de CEOs si no están en la base de datos.
 
 ## Alcance funcional implementado
 

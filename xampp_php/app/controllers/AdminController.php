@@ -31,8 +31,9 @@ class AdminController
         $sales = Report::salesByAirline();
         $pendingAirlineRequests = AirlineRequest::allPending();
         $pendingFlightRequests = FlightRequest::allPending();
+        $pendingCEOs = User::getPendingCEOs();
 
-        view('admin', compact('airlines', 'promotions', 'news', 'reports', 'sales', 'pendingAirlineRequests', 'pendingFlightRequests'));
+        view('admin', compact('airlines', 'promotions', 'news', 'reports', 'sales', 'pendingAirlineRequests', 'pendingFlightRequests', 'pendingCEOs'));
     }
 
     public static function approveAirlineRequest(): void
@@ -110,6 +111,52 @@ class AdminController
         redirect_to('admin');
     }
 
+    public static function approveCEO(): void
+    {
+        require_role('admin');
+
+        $id = int_value($_POST['ceo_id'] ?? 0);
+        $ceo = User::findById($id);
+
+        if (!$ceo || $ceo['role'] !== 'ceo') {
+            flash('error', 'CEO no encontrado.');
+            redirect_to('admin');
+        }
+
+        if (!(int) ($ceo['is_approved'] ?? 1) === 0) {
+            flash('error', 'Este CEO ya fue procesado.');
+            redirect_to('admin');
+        }
+
+        User::approveCEO($id);
+        $mailSent = send_app_mail($ceo['email'], 'Solicitud de CEO Aprobada', "Hola {$ceo['name']}, tu solicitud para ser CEO ha sido aprobada. Ya podes iniciar sesion.");
+        flash('ok', 'CEO aprobado correctamente.');
+        redirect_to('admin');
+    }
+
+    public static function rejectCEO(): void
+    {
+        require_role('admin');
+
+        $id = int_value($_POST['ceo_id'] ?? 0);
+        $ceo = User::findById($id);
+
+        if (!$ceo || $ceo['role'] !== 'ceo') {
+            flash('error', 'CEO no encontrado.');
+            redirect_to('admin');
+        }
+
+        if (!(int) ($ceo['is_approved'] ?? 1) === 0) {
+            flash('error', 'Este CEO ya fue procesado.');
+            redirect_to('admin');
+        }
+
+        User::rejectCEO($id);
+        $mailSent = send_app_mail($ceo['email'], 'Solicitud de CEO Rechazada', "Hola {$ceo['name']}, lamentablemente tu solicitud para ser CEO ha sido rechazada.");
+        flash('ok', 'CEO rechazado y su solicitud eliminada.');
+        redirect_to('admin');
+    }
+
     public static function createAirline(): void
     {
         require_role('admin');
@@ -124,6 +171,46 @@ class AdminController
 
         Airline::create($name, $code, $country);
         flash('ok', 'Aerolinea creada.');
+        redirect_to('admin');
+    }
+
+    public static function createCeo(): void
+    {
+        require_role('admin');
+
+        $name = clean_text($_POST['name'] ?? '');
+        $email = clean_email($_POST['email'] ?? '');
+        $password = (string) ($_POST['password'] ?? '');
+        $airlineId = int_value($_POST['airline_id'] ?? 0);
+
+        if ($name === '' || $email === '' || $password === '' || $airlineId < 1) {
+            flash('error', 'Completa todos los campos para crear el CEO.');
+            redirect_to('admin');
+        }
+
+        if (!valid_email($email)) {
+            flash('error', 'Email invalido.');
+            redirect_to('admin');
+        }
+
+        if (!Airline::findById($airlineId)) {
+            flash('error', 'Aerolinea invalida.');
+            redirect_to('admin');
+        }
+
+        if (User::findByEmail($email)) {
+            flash('error', 'Ya existe un usuario con ese email.');
+            redirect_to('admin');
+        }
+
+        if (User::findByAirlineAndRole($airlineId, 'ceo')) {
+            flash('error', 'Esa aerolinea ya tiene un CEO asignado.');
+            redirect_to('admin');
+        }
+
+        $hash = password_hash($password, PASSWORD_DEFAULT);
+        User::create($name, $email, '', '', '', $hash, 'ceo', $airlineId);
+        flash('ok', 'CEO creado correctamente.');
         redirect_to('admin');
     }
 
@@ -183,13 +270,15 @@ class AdminController
         require_role('admin');
         $title = clean_text($_POST['title'] ?? '');
         $content = clean_text($_POST['content'] ?? '');
+        $startDate = trim((string) ($_POST['start_date'] ?? '')) ?: null;
+        $endDate = trim((string) ($_POST['end_date'] ?? '')) ?: null;
 
         if ($title === '' || $content === '') {
             flash('error', 'Completa titulo y contenido.');
             redirect_to('admin');
         }
 
-        News::create($title, $content);
+        News::create($title, $content, $startDate, $endDate);
         flash('ok', 'Novedad publicada.');
         redirect_to('admin');
     }
@@ -200,13 +289,15 @@ class AdminController
         $id = int_value($_POST['news_id'] ?? 0);
         $title = clean_text($_POST['title'] ?? '');
         $content = clean_text($_POST['content'] ?? '');
+        $startDate = trim((string) ($_POST['start_date'] ?? '')) ?: null;
+        $endDate = trim((string) ($_POST['end_date'] ?? '')) ?: null;
 
         if ($id < 1 || $title === '' || $content === '') {
             flash('error', 'Datos invalidos para actualizar novedad.');
             redirect_to('admin');
         }
 
-        News::update($id, $title, $content);
+        News::update($id, $title, $content, $startDate, $endDate);
         flash('ok', 'Novedad actualizada.');
         redirect_to('admin');
     }

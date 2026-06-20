@@ -28,6 +28,27 @@
 
       <hr class="my-4">
 
+      <div class="mb-4">
+        <button class="btn btn-outline-secondary w-100" type="button" data-bs-toggle="collapse" data-bs-target="#resetCollapse" aria-expanded="false" aria-controls="resetCollapse">
+          ¿Olvidaste tu contraseña? Pulsa para recuperar
+        </button>
+
+        <div class="collapse mt-3" id="resetCollapse">
+          <div class="card card-body p-3">
+            <p class="text-muted mb-3">Ingresa tu email para recibir una clave temporal y luego cámbiala en tu perfil.</p>
+            <form method="post" action="<?php echo BASE_URL; ?>/index.php?page=login" class="needs-validation" novalidate>
+              <input type="hidden" name="action" value="request_password_reset">
+              <div class="mb-3">
+                <label for="reset_email" class="form-label">Email</label>
+                <input id="reset_email" name="email" type="email" class="form-control" autocomplete="email" placeholder="tu@email.com" required>
+                <div class="invalid-feedback">Ingresa un email valido.</div>
+              </div>
+              <button class="btn btn-outline-secondary w-100" type="submit">Enviar clave temporal</button>
+            </form>
+          </div>
+        </div>
+      </div>
+
       <p class="mb-2 text-center">No tenes cuenta?</p>
       <p class="text-center mb-0">
         <a class="btn btn-outline-primary btn-sm" href="<?php echo BASE_URL; ?>/index.php?page=register">Registrarse</a>

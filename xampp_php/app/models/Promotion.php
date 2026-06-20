@@ -24,6 +24,23 @@ class Promotion
         ]);
     }
 
+    public static function allByAirline(int $airlineId): array
+    {
+        $sql = 'SELECT p.*, a.name AS airline_name FROM promotions p JOIN airlines a ON a.id = p.airline_id WHERE p.airline_id = :airline_id ORDER BY p.created_at DESC';
+        $stmt = Database::connection()->prepare($sql);
+        $stmt->execute(['airline_id' => $airlineId]);
+        return $stmt->fetchAll();
+    }
+
+    public static function find(int $id): ?array
+    {
+        $sql = 'SELECT * FROM promotions WHERE id = :id LIMIT 1';
+        $stmt = Database::connection()->prepare($sql);
+        $stmt->execute(['id' => $id]);
+        $row = $stmt->fetch();
+        return $row ?: null;
+    }
+
     public static function update(int $id, int $airlineId, string $title, string $description, float $discount, int $isActive): bool
     {
         $db = Database::connection();

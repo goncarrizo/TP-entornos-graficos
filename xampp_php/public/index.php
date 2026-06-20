@@ -23,6 +23,9 @@ if ($action) {
             case 'login':
                 AuthController::login();
                 break;
+            case 'request_password_reset':
+                AuthController::requestPasswordReset();
+                break;
             case 'logout':
                 AuthController::logout();
                 break;
@@ -68,6 +71,9 @@ if ($action) {
             case 'create_airline':
                 AdminController::createAirline();
                 break;
+            case 'create_ceo':
+                AdminController::createCeo();
+                break;
             case 'create_airline_request':
                 CeoController::createAirlineRequest();
                 break;
@@ -94,6 +100,12 @@ if ($action) {
                 break;
             case 'deny_flight_request':
                 AdminController::denyFlightRequest();
+                break;
+            case 'approve_ceo':
+                AdminController::approveCEO();
+                break;
+            case 'reject_ceo':
+                AdminController::rejectCEO();
                 break;
             case 'approve_reservation':
                 CeoController::approveReservation();
@@ -143,7 +155,7 @@ switch ($page) {
         view('home', [
             'user' => $homeUser,
             'airlines' => Airline::all(),
-            'news' => News::all(),
+            'news' => News::allActive(),
             'promotions' => Promotion::all(),
             'favorite_flights' => $favoriteFlights,
             'recent_reservations' => $recentReservations,
@@ -204,9 +216,10 @@ switch ($page) {
     case 'news':
         $newsPage = max(1, (int) ($_GET['p'] ?? 1));
         $perPage = 5;
-        $total = News::countAll();
+        // Only list active news to public
+        $total = News::countActive();
         $pager = paginate($total, $perPage, $newsPage);
-        $news = News::paginated($pager['limit'], $pager['offset']);
+        $news = News::paginatedActive($pager['limit'], $pager['offset']);
         view('news', ['news' => $news, 'pager' => $pager]);
         break;
     case 'admin':

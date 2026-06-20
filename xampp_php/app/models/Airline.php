@@ -17,6 +17,15 @@ class Airline
         return $row ?: null;
     }
 
+    public static function findById(int $id): ?array
+    {
+        $sql = 'SELECT * FROM airlines WHERE id = :id LIMIT 1';
+        $stmt = Database::connection()->prepare($sql);
+        $stmt->execute(['id' => $id]);
+        $row = $stmt->fetch();
+        return $row ?: null;
+    }
+
     public static function create(string $name, string $code, string $country): bool
     {
         $sql = 'INSERT INTO airlines (name, code, country) VALUES (:name, :code, :country)';

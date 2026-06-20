@@ -136,6 +136,8 @@ CREATE TABLE IF NOT EXISTS news (
   id INT AUTO_INCREMENT PRIMARY KEY,
   title VARCHAR(180) NOT NULL,
   content TEXT NOT NULL,
+  start_date DATE NULL,
+  end_date DATE NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -158,6 +160,6 @@ INSERT INTO promotions (airline_id, title, description, discount_percent, status
 (1, 'Promo Otono', '15% de descuento en rutas nacionales.', 15, 'approved', 1),
 (2, 'Promo Invierno', '10% de descuento para vuelos a la Patagonia.', 10, 'pending', 1);
 
-INSERT INTO news (title, content) VALUES
-('Nueva ruta Rosario - Cordoba', 'Se agregan 4 frecuencias semanales para mejorar conectividad regional.'),
-('Check-in digital 48hs antes', 'Ahora podes realizar check-in online desde cualquier dispositivo.');
+INSERT INTO news (title, content, start_date, end_date) VALUES
+('Nueva ruta Rosario - Cordoba', 'Se agregan 4 frecuencias semanales para mejorar conectividad regional.', NULL, NULL),
+('Check-in digital 48hs antes', 'Ahora podes realizar check-in online desde cualquier dispositivo.', NULL, NULL);

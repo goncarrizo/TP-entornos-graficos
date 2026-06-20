@@ -15,8 +15,12 @@
       <a href="<?php echo BASE_URL; ?>/index.php?page=register">Registrarse</a>
       <a href="<?php echo BASE_URL; ?>/index.php?page=profile">Cuenta</a>
       <a href="<?php echo BASE_URL; ?>/index.php?page=reservations">Reservas</a>
-      <a href="<?php echo BASE_URL; ?>/index.php?page=admin">Panel Admin</a>
-      <a href="<?php echo BASE_URL; ?>/index.php?page=ceo">Panel CEO</a>
+      <?php if (has_role('admin')): ?>
+        <a href="<?php echo BASE_URL; ?>/index.php?page=admin">Panel Admin</a>
+      <?php endif; ?>
+      <?php if (has_role('ceo')): ?>
+        <a href="<?php echo BASE_URL; ?>/index.php?page=ceo">Panel CEO</a>
+      <?php endif; ?>
     </div>
   </div>
 </footer>

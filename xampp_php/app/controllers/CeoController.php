@@ -6,7 +6,14 @@ class CeoController
     {
         require_role('ceo');
 
-        $rows = Report::salesByAirline();
+        $user = current_user();
+        $airlineId = (int) ($user['airline_id'] ?? 0);
+        if ($airlineId < 1) {
+            flash('error', 'Tu cuenta CEO no tiene una aerolinea asignada.');
+            redirect_to('ceo');
+        }
+
+        $rows = Report::salesByAirline($airlineId);
 
         header('Content-Type: text/csv; charset=utf-8');
         header('Content-Disposition: attachment; filename="reporte_ventas_ceo.csv"');
@@ -24,7 +31,14 @@ class CeoController
     {
         require_role('ceo');
 
-        $rows = Report::occupancyByFlight();
+        $user = current_user();
+        $airlineId = (int) ($user['airline_id'] ?? 0);
+        if ($airlineId < 1) {
+            flash('error', 'Tu cuenta CEO no tiene una aerolinea asignada.');
+            redirect_to('ceo');
+        }
+
+        $rows = Report::occupancyByFlight($airlineId);
 
         header('Content-Type: text/csv; charset=utf-8');
         header('Content-Disposition: attachment; filename="reporte_ocupacion_ceo.csv"');
@@ -50,14 +64,26 @@ class CeoController
         require_role('ceo');
 
         $user = current_user();
-        $flights = Flight::all();
-        $airlines = Airline::all();
-        $promotions = Promotion::all();
-        $sales = Report::salesByAirline();
-        $occupancy = Report::occupancyByFlight();
+        $airlineId = (int) ($user['airline_id'] ?? 0);
+        if ($airlineId < 1) {
+            flash('error', 'Tu cuenta CEO no tiene una aerolinea asignada. Contacta al admin.');
+            redirect_to('home');
+        }
+
+        $airline = Airline::findById($airlineId);
+        if (!$airline) {
+            flash('error', 'Aerolinea asignada no encontrada. Contacta al admin.');
+            redirect_to('home');
+        }
+
+        $flights = Flight::all(null, null, null, $airlineId);
+        $airlines = [$airline];
+        $promotions = Promotion::allByAirline($airlineId);
+        $sales = Report::salesByAirline($airlineId);
+        $occupancy = Report::occupancyByFlight($airlineId);
         $pendingAirlineRequests = AirlineRequest::byUser((int) $user['id']);
         $pendingFlightRequests = FlightRequest::byUser((int) $user['id']);
-        $pendingReservations = Reservation::allPending();
+        $pendingReservations = Reservation::allPendingByAirline($airlineId);
 
         view('ceo', compact('flights', 'airlines', 'promotions', 'sales', 'occupancy', 'pendingAirlineRequests', 'pendingFlightRequests', 'pendingReservations'));
     }
@@ -66,15 +92,17 @@ class CeoController
     {
         require_role('ceo');
 
+        $user = current_user();
+        $airlineId = (int) ($user['airline_id'] ?? 0);
         $id = int_value($_POST['reservation_id'] ?? 0);
         $reservation = Reservation::find($id);
 
-        if (!$reservation || $reservation['status'] !== 'pending') {
-            flash('error', 'Reserva no encontrada o ya procesada.');
+        if (!$reservation || $reservation['status'] !== 'pending' || (int) $reservation['airline_id'] !== $airlineId) {
+            flash('error', 'Reserva no encontrada, no corresponde a tu aerolinea o ya fue procesada.');
             redirect_to('ceo');
         }
 
-        if (Reservation::confirm($id, (int) current_user()['id'])) {
+        if (Reservation::confirm($id, (int) $user['id'])) {
             flash('ok', 'Reserva aprobada y confirmada.');
             send_app_mail((string) $reservation['user_email'], 'Reserva aprobada', "Tu reserva #$id ha sido aprobada y confirmada.");
         } else {
@@ -88,15 +116,17 @@ class CeoController
     {
         require_role('ceo');
 
+        $user = current_user();
+        $airlineId = (int) ($user['airline_id'] ?? 0);
         $id = int_value($_POST['reservation_id'] ?? 0);
         $reservation = Reservation::find($id);
 
-        if (!$reservation || $reservation['status'] !== 'pending') {
-            flash('error', 'Reserva no encontrada o ya procesada.');
+        if (!$reservation || $reservation['status'] !== 'pending' || (int) $reservation['airline_id'] !== $airlineId) {
+            flash('error', 'Reserva no encontrada, no corresponde a tu aerolinea o ya fue procesada.');
             redirect_to('ceo');
         }
 
-        if (Reservation::deny($id, (int) current_user()['id'])) {
+        if (Reservation::deny($id, (int) $user['id'])) {
             Flight::returnSeats((int) $reservation['flight_id'], (int) $reservation['seats']);
             flash('ok', 'Reserva denegada. Los asientos fueron liberados.');
             send_app_mail((string) $reservation['user_email'], 'Reserva denegada', "Tu reserva #$id ha sido denegada por el CEO.");
@@ -139,7 +169,8 @@ class CeoController
     public static function createPromotion(): void
     {
         require_role('ceo');
-
+        $user = current_user();
+        $userAirlineId = (int) ($user['airline_id'] ?? 0);
         $airlineId = int_value($_POST['airline_id'] ?? 0);
         $title = clean_text($_POST['title'] ?? '');
         $description = clean_text($_POST['description'] ?? '');
@@ -147,6 +178,12 @@ class CeoController
 
         if ($airlineId < 1 || $title === '' || $discount <= 0) {
             flash('error', 'Datos invalidos para promocion.');
+            redirect_to('ceo');
+        }
+
+        // Ensure CEO can only create promotions for their assigned airline
+        if ($userAirlineId < 1 || $airlineId !== $userAirlineId) {
+            flash('error', 'No autorizado para crear promociones para esa aerolinea.');
             redirect_to('ceo');
         }
 
@@ -160,14 +197,22 @@ class CeoController
         require_role('ceo');
 
         $id = int_value($_POST['promotion_id'] ?? 0);
+        $user = current_user();
+        $userAirlineId = (int) ($user['airline_id'] ?? 0);
         $airlineId = int_value($_POST['airline_id'] ?? 0);
         $title = clean_text($_POST['title'] ?? '');
         $description = clean_text($_POST['description'] ?? '');
         $discount = (float) ($_POST['discount_percent'] ?? 0);
-        $isActive = isset($_POST['is_active']) ? 1 : 0;
+        // CEOs are not allowed to activate promotions directly; only admins can approve/activate.
+        $isActive = 0;
 
         if ($id < 1 || $airlineId < 1 || $title === '' || $discount <= 0) {
             flash('error', 'Datos invalidos para actualizar promocion.');
+            redirect_to('ceo');
+        }
+        // Ensure CEO can only update promotions for their assigned airline
+        if ($userAirlineId < 1 || $airlineId !== $userAirlineId) {
+            flash('error', 'No autorizado para editar promociones de esa aerolinea.');
             redirect_to('ceo');
         }
 

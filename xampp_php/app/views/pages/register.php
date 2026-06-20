@@ -58,10 +58,49 @@
             <input id="reg_password_confirm" name="password_confirm" type="password" class="form-control" autocomplete="new-password" placeholder="Repetir clave" minlength="6" required>
             <div class="invalid-feedback">Las claves deben coincidir.</div>
           </div>
+          <div class="col-md-6">
+            <label for="reg_role" class="form-label">¿Qué tipo de cuenta deseas crear?</label>
+            <select id="reg_role" name="role" class="form-select" required>
+              <option value="customer" selected>Pasajero</option>
+              <option value="ceo">CEO de Aerolínea</option>
+            </select>
+            <div class="invalid-feedback">Selecciona un tipo de cuenta.</div>
+          </div>
+          <div class="col-md-6" id="airline_selector" style="display: none;">
+            <label for="reg_airline_id" class="form-label">Selecciona tu aerolínea</label>
+            <select id="reg_airline_id" name="airline_id" class="form-select">
+              <option value="">-- Seleccionar aerolínea --</option>
+              <?php 
+              require_once __DIR__ . '/../../models/Airline.php';
+              $airlines = Airline::all();
+              foreach ($airlines as $airline): 
+              ?>
+              <option value="<?php echo (int) $airline['id']; ?>">
+                <?php echo htmlspecialchars($airline['name'] . ' (' . $airline['code'] . ')'); ?>
+              </option>
+              <?php endforeach; ?>
+            </select>
+            <div class="invalid-feedback">Debes seleccionar una aerolínea.</div>
+            <small class="text-muted d-block mt-2">⚠️ Tu solicitud será revisada por un administrador antes de poder acceder.</small>
+          </div>
         </div>
 
         <button class="btn btn-success w-100 mt-4 btn-lg" type="submit">Crear cuenta</button>
       </form>
-    </div>
-  </section>
-</div>
+
+      <script>
+        const roleSelect = document.getElementById('reg_role');
+        const airlineSelector = document.getElementById('airline_selector');
+        const airlineInput = document.getElementById('reg_airline_id');
+
+        roleSelect.addEventListener('change', function() {
+          if (this.value === 'ceo') {
+            airlineSelector.style.display = 'block';
+            airlineInput.setAttribute('required', 'required');
+          } else {
+            airlineSelector.style.display = 'none';
+            airlineInput.removeAttribute('required');
+            airlineInput.value = '';
+          }
+        });
+      </script>

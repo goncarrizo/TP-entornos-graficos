@@ -16,7 +16,7 @@ $static = [
 
 // News pagination
 $newsPerPage = 5;
-$newsTotal = News::countAll();
+$newsTotal = News::countActive();
 $newsPages = (int) ceil($newsTotal / $newsPerPage);
 
 // Flights pagination (no filters)

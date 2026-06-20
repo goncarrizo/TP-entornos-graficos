@@ -108,6 +108,7 @@
   <section class="col-lg-6" aria-labelledby="promo-ceo-title">
     <div class="card p-3">
       <h2 id="promo-ceo-title" class="h5">2) Crear promocion</h2>
+      <p class="small text-muted">Las promociones serán enviadas para revisión del administrador. La activación visible al público se efectúa únicamente cuando un administrador las aprueba.</p>
       <form method="post" action="<?php echo BASE_URL; ?>/index.php?page=ceo" class="needs-validation" novalidate>
         <input type="hidden" name="action" value="create_promotion">
         <div class="mb-2">
@@ -231,9 +232,13 @@
               </div>
               <div class="col-md-4"><input name="title" class="form-control" value="<?php echo htmlspecialchars($promotion['title']); ?>" required></div>
               <div class="col-md-2"><input type="number" step="0.01" min="1" max="100" name="discount_percent" class="form-control" value="<?php echo (float) $promotion['discount_percent']; ?>" required></div>
-              <div class="col-md-2 form-check align-self-center">
-                <input class="form-check-input" type="checkbox" name="is_active" id="active_<?php echo (int) $promotion['id']; ?>" <?php echo (int) $promotion['is_active'] === 1 ? 'checked' : ''; ?>>
-                <label class="form-check-label" for="active_<?php echo (int) $promotion['id']; ?>">Activa</label>
+              <div class="col-md-2 align-self-center">
+                <?php if ((int) $promotion['is_active'] === 1): ?>
+                  <div class="small text-success">Activa (solo admin)</div>
+                <?php else: ?>
+                  <div class="small text-muted">No activa</div>
+                <?php endif; ?>
+                <div class="small text-muted">Activación requiere aprobación del administrador.</div>
               </div>
               <div class="col-12"><textarea name="description" class="form-control" rows="2"><?php echo htmlspecialchars($promotion['description'] ?? ''); ?></textarea></div>
               <div class="col-12 small text-muted">Estado admin: <span class="status-badge <?php echo $statusClass; ?>"><?php echo htmlspecialchars($promotion['status']); ?></span></div>

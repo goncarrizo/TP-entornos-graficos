@@ -66,7 +66,7 @@ class Reservation
 
     public static function find(int $id): ?array
     {
-        $sql = 'SELECT r.*, f.departure_time, f.origin, f.destination, u.email AS user_email, u.name AS user_name
+        $sql = 'SELECT r.*, f.departure_time, f.origin, f.destination, f.airline_id AS airline_id, u.email AS user_email, u.name AS user_name
                 FROM reservations r
                 JOIN flights f ON f.id = r.flight_id
                 JOIN users u ON u.id = r.user_id
@@ -75,6 +75,20 @@ class Reservation
         $stmt->execute(['id' => $id]);
         $row = $stmt->fetch();
         return $row ?: null;
+    }
+
+    public static function allPendingByAirline(int $airlineId): array
+    {
+        $sql = "SELECT r.*, f.origin, f.destination, f.departure_time, a.name AS airline_name, u.name AS user_name, u.email AS user_email
+                FROM reservations r
+                JOIN flights f ON f.id = r.flight_id
+                JOIN airlines a ON a.id = f.airline_id
+                JOIN users u ON u.id = r.user_id
+                WHERE r.status = 'pending' AND f.airline_id = :airline_id
+                ORDER BY r.created_at ASC";
+        $stmt = Database::connection()->prepare($sql);
+        $stmt->execute(['airline_id' => $airlineId]);
+        return $stmt->fetchAll();
     }
 
     public static function byUser(int $userId): array

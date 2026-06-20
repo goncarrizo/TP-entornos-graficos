@@ -11,10 +11,13 @@ CREATE TABLE users (
   birthdate DATE NULL,
   password_hash VARCHAR(255) NOT NULL,
   role ENUM('admin', 'ceo', 'customer') NOT NULL DEFAULT 'customer',
+  airline_id INT NULL,
   email_verified TINYINT(1) NOT NULL DEFAULT 0,
   user_icon VARCHAR(64) NULL DEFAULT NULL,
   last_login_at DATETIME NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  is_approved TINYINT(1) DEFAULT 1,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_users_role_approved (role, is_approved)
 );
 
 CREATE TABLE airlines (
@@ -107,6 +110,9 @@ CREATE TABLE reservations (
   INDEX idx_res_status (status)
 );
 
+ALTER TABLE users
+  ADD CONSTRAINT fk_users_airline FOREIGN KEY (airline_id) REFERENCES airlines(id);
+
 CREATE TABLE reservation_status_history (
   id INT AUTO_INCREMENT PRIMARY KEY,
   reservation_id INT NOT NULL,
@@ -142,14 +148,16 @@ CREATE TABLE news (
   id INT AUTO_INCREMENT PRIMARY KEY,
   title VARCHAR(180) NOT NULL,
   content TEXT NOT NULL,
+  start_date DATE NULL,
+  end_date DATE NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Usuarios demo (password = 123456 con MD5).
-INSERT INTO users (name, email, password_hash, role, email_verified) VALUES
-('Admin Principal', 'admin@tp.com', MD5('123456'), 'admin', 1),
-('CEO Andes Airlines', 'ceo@tp.com', MD5('123456'), 'ceo', 1),
-('Cliente Demo', 'cliente@tp.com', MD5('123456'), 'customer', 1);
+INSERT INTO users (name, email, password_hash, role, airline_id, email_verified) VALUES
+('Admin Principal', 'admin@tp.com', MD5('123456'), 'admin', NULL, 1),
+('CEO Andes Airlines', 'ceo@tp.com', MD5('123456'), 'ceo', 1, 1),
+('Cliente Demo', 'cliente@tp.com', MD5('123456'), 'customer', NULL, 1);
 
 INSERT INTO airlines (name, code, country) VALUES
 ('Andes Airlines', 'AND', 'Argentina'),
@@ -165,6 +173,6 @@ INSERT INTO promotions (airline_id, title, description, discount_percent, status
 (1, 'Promo Otono', '15% de descuento en rutas nacionales.', 15, 'approved', 1),
 (2, 'Promo Invierno', '10% de descuento para vuelos a la Patagonia.', 10, 'pending', 1);
 
-INSERT INTO news (title, content) VALUES
-('Nueva ruta Rosario - Cordoba', 'Se agregan 4 frecuencias semanales para mejorar conectividad regional.'),
-('Check-in digital 48hs antes', 'Ahora podes realizar check-in online desde cualquier dispositivo.');
+INSERT INTO news (title, content, start_date, end_date) VALUES
+('Nueva ruta Rosario - Cordoba', 'Se agregan 4 frecuencias semanales para mejorar conectividad regional.', NULL, NULL),
+('Check-in digital 48hs antes', 'Ahora podes realizar check-in online desde cualquier dispositivo.', NULL, NULL);
