@@ -447,7 +447,10 @@ h3,
 }
 
 .flight-card-media {
+  display: block;
   height: 150px;
+  width: 100%;
+  overflow: hidden;
   border-radius: 12px;
   background-size: cover, cover;
   background-position: center, center;
@@ -459,6 +462,14 @@ h3,
   margin-bottom: 0.75rem;
   position: relative;
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.25);
+}
+
+.flight-card-media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
 }
 
 .flight-card-media::after {

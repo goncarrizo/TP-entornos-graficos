@@ -20,14 +20,24 @@ class Promotion
             'description' => $description,
             'discount_percent' => $discount,
             'status' => 'pending',
-            'is_active' => 1,
+            'is_active' => 0,
         ]);
     }
 
     public static function update(int $id, int $airlineId, string $title, string $description, float $discount, int $isActive): bool
     {
+        $db = Database::connection();
+
+        if ($isActive === 1) {
+            $deactivateStmt = $db->prepare('UPDATE promotions SET is_active = 0 WHERE airline_id = :airline_id AND id != :id');
+            $deactivateStmt->execute([
+                'airline_id' => $airlineId,
+                'id' => $id,
+            ]);
+        }
+
         $sql = 'UPDATE promotions SET airline_id = :airline_id, title = :title, description = :description, discount_percent = :discount_percent, is_active = :is_active WHERE id = :id';
-        $stmt = Database::connection()->prepare($sql);
+        $stmt = $db->prepare($sql);
 
         return $stmt->execute([
             'id' => $id,
@@ -47,8 +57,31 @@ class Promotion
 
     public static function setStatus(int $id, string $status): bool
     {
-        $sql = 'UPDATE promotions SET status = :status WHERE id = :id';
-        $stmt = Database::connection()->prepare($sql);
-        return $stmt->execute(['id' => $id, 'status' => $status]);
+        $db = Database::connection();
+        $promoStmt = $db->prepare('SELECT airline_id FROM promotions WHERE id = :id');
+        $promoStmt->execute(['id' => $id]);
+        $promo = $promoStmt->fetch();
+
+        if (!$promo) {
+            return false;
+        }
+
+        $isActive = $status === 'approved' ? 1 : 0;
+
+        if ($isActive === 1) {
+            $deactivateStmt = $db->prepare('UPDATE promotions SET is_active = 0 WHERE airline_id = :airline_id AND id != :id');
+            $deactivateStmt->execute([
+                'airline_id' => (int) $promo['airline_id'],
+                'id' => $id,
+            ]);
+        }
+
+        $sql = 'UPDATE promotions SET status = :status, is_active = :is_active WHERE id = :id';
+        $stmt = $db->prepare($sql);
+        return $stmt->execute([
+            'id' => $id,
+            'status' => $status,
+            'is_active' => $isActive,
+        ]);
     }
 }

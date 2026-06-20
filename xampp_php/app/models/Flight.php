@@ -234,8 +234,36 @@ class Flight
 
     public static function delete(int $id): bool
     {
-        $stmt = Database::connection()->prepare('DELETE FROM flights WHERE id = :id');
-        return $stmt->execute(['id' => $id]);
+        $pdo = Database::connection();
+
+        try {
+            $pdo->beginTransaction();
+
+            $stmt = $pdo->prepare('DELETE FROM reservation_status_history WHERE reservation_id IN (SELECT id FROM reservations WHERE flight_id = :id)');
+            $stmt->execute(['id' => $id]);
+
+            $stmt = $pdo->prepare('DELETE FROM user_favorites WHERE flight_id = :id');
+            $stmt->execute(['id' => $id]);
+
+            $stmt = $pdo->prepare('DELETE FROM reservations WHERE flight_id = :id');
+            $stmt->execute(['id' => $id]);
+
+            $stmt = $pdo->prepare('DELETE FROM flights WHERE id = :id');
+            $result = $stmt->execute(['id' => $id]);
+
+            if (!$result) {
+                $pdo->rollBack();
+                return false;
+            }
+
+            $pdo->commit();
+            return true;
+        } catch (Throwable $e) {
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+            throw $e;
+        }
     }
 
     public static function reserveSeats(int $flightId, int $seats): bool

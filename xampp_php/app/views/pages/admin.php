@@ -97,24 +97,22 @@
   <section class="col-lg-6" aria-labelledby="promo-admin-title">
     <div class="card p-3">
       <h2 id="promo-admin-title" class="h5">2) Promociones pendientes</h2>
-      <?php if (empty($promotions)): ?>
+      <?php
+        $pendingPromotions = array_values(array_filter(
+            $promotions,
+            static fn(array $promotion): bool => ($promotion['status'] ?? '') === 'pending'
+        ));
+      ?>
+      <?php if (empty($pendingPromotions)): ?>
         <div class="empty-state compact">
           <p class="mb-0">No hay promociones para revisar.</p>
         </div>
       <?php else: ?>
-        <?php foreach ($promotions as $promotion): ?>
-          <?php
-            $statusClass = 'info';
-            if ($promotion['status'] === 'approved') {
-                $statusClass = 'success';
-            } elseif ($promotion['status'] === 'denied') {
-                $statusClass = 'danger';
-            }
-          ?>
+        <?php foreach ($pendingPromotions as $promotion): ?>
           <div class="border rounded p-2 mb-2 d-flex justify-content-between align-items-center gap-2">
             <div>
               <strong><?php echo htmlspecialchars($promotion['airline_name']); ?></strong> - <?php echo htmlspecialchars($promotion['title']); ?>
-              <div class="small mt-1">Estado: <span class="status-badge <?php echo $statusClass; ?>"><?php echo htmlspecialchars($promotion['status']); ?></span></div>
+              <div class="small mt-1">Estado: <span class="status-badge info"><?php echo htmlspecialchars($promotion['status']); ?></span></div>
             </div>
             <div class="d-flex gap-2">
               <form method="post" action="<?php echo BASE_URL; ?>/index.php?page=admin">

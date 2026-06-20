@@ -17,8 +17,35 @@ class AuthController
 
         $passwordsMatch = $password !== '' && $password === $passwordConfirm;
 
-        if (!valid_name($name) || !valid_name($lastname) || !valid_email($email) || !valid_phone($phone) || !valid_document($document) || !valid_birthdate($birthdate) || !valid_password($password) || !$passwordsMatch) {
-            flash('error', 'Revisa los datos del registro antes de continuar.');
+        $validationErrors = [];
+        if (!valid_name($name)) {
+            $validationErrors[] = 'nombre';
+        }
+        if (!valid_name($lastname)) {
+            $validationErrors[] = 'apellido';
+        }
+        if (!valid_email($email)) {
+            $validationErrors[] = 'email';
+        }
+        if (!valid_phone($phone)) {
+            $validationErrors[] = 'teléfono';
+        }
+        if (!valid_document($document)) {
+            $validationErrors[] = 'documento';
+        }
+        if (!valid_birthdate($birthdate)) {
+            $validationErrors[] = 'fecha de nacimiento';
+        }
+        if (!valid_password($password)) {
+            $validationErrors[] = 'clave';
+        }
+        if (!$passwordsMatch) {
+            $validationErrors[] = 'confirmación de clave';
+        }
+
+        if (!empty($validationErrors)) {
+            $errorText = 'Revisa los datos del registro antes de continuar. Campos inválidos: ' . implode(', ', $validationErrors) . '.';
+            flash('error', $errorText);
             redirect_to('register');
         }
 
@@ -30,8 +57,14 @@ class AuthController
         // Use password_hash (bcrypt/argon2 depending on PHP) for secure password storage.
         $hash = password_hash($password, PASSWORD_DEFAULT);
         User::create($fullName, $email, $phone, $document, $birthdate, $hash);
-        send_app_mail($email, 'Registro AirARG', "Hola $fullName, tu cuenta fue creada correctamente.");
-        flash('ok', 'Registro exitoso. Ya podes iniciar sesion.');
+
+        $mailSent = send_app_mail($email, 'Registro AirARG', "Hola $fullName, tu cuenta fue creada correctamente.");
+        if ($mailSent) {
+            flash('ok', 'Registro exitoso. Ya podes iniciar sesion.');
+        } else {
+            flash('ok', 'Registro exitoso. Ya podes iniciar sesion. El correo de bienvenida no pudo enviarse desde este entorno.');
+        }
+
         redirect_to('login');
     }
 

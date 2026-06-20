@@ -77,6 +77,7 @@
 <?php
 // Preferir assets locales cuando existan
 $destinationImages = [];
+$destinationImages['generic'] = BASE_URL . '/assets/images/PLACEHOLDER_Generic.svg';
 $remoteMap = [
   'bariloche' => 'https://images.unsplash.com/photo-1589909202802-8f4aadce1849?auto=format&fit=crop&w=1200&q=80',
   'mendoza' => 'https://images.unsplash.com/photo-1602459651957-2f0580f2d0f3?auto=format&fit=crop&w=1200&q=80',
@@ -87,11 +88,27 @@ $remoteMap = [
 ];
 
 foreach ($remoteMap as $k => $remote) {
+  $baseVariants = [];
+  $slug = strtolower($k);
+  $slugUnderscore = str_replace(' ', '_', $slug);
+  $slugDash = str_replace(' ', '-', $slug);
+
+  $baseVariants[] = $slugUnderscore;
+  $baseVariants[] = $slug;
+  $baseVariants[] = $slugDash;
+
   $cleanName = str_replace(' ', '_', ucwords($k));
   $localCandidates = [
-    __DIR__ . '/../../public/assets/images/' . 'PLACEHOLDER_' . $cleanName . '.svg',
-    __DIR__ . '/../../public/assets/images/' . strtolower($k) . '.webp',
-    __DIR__ . '/../../public/assets/images/' . strtolower($k) . '.jpg',
+    __DIR__ . '/../../../public/assets/images/' . $slugUnderscore . '.webp',
+    __DIR__ . '/../../../public/assets/images/' . $slugUnderscore . '.jpg',
+    __DIR__ . '/../../../public/assets/images/' . $slugUnderscore . '.avif',
+    __DIR__ . '/../../../public/assets/images/' . $slug . '.webp',
+    __DIR__ . '/../../../public/assets/images/' . $slug . '.jpg',
+    __DIR__ . '/../../../public/assets/images/' . $slug . '.avif',
+    __DIR__ . '/../../../public/assets/images/' . $slugDash . '.webp',
+    __DIR__ . '/../../../public/assets/images/' . $slugDash . '.jpg',
+    __DIR__ . '/../../../public/assets/images/' . $slugDash . '.avif',
+    __DIR__ . '/../../../public/assets/images/' . 'PLACEHOLDER_' . $cleanName . '.svg',
   ];
 
   $found = null;
@@ -102,7 +119,7 @@ foreach ($remoteMap as $k => $remote) {
     }
   }
 
-  $destinationImages[$k] = $found ?? $remote;
+  $destinationImages[$k] = $found ?? $destinationImages['generic'];
 }
 ?>
 
@@ -124,16 +141,24 @@ foreach ($remoteMap as $k => $remote) {
         <?php
           $destinationKey = strtolower((string) ($flight['destination'] ?? ''));
           $originKey = strtolower((string) ($flight['origin'] ?? ''));
-          $flightImage = $destinationImages[$destinationKey] ?? ($destinationImages[$originKey] ?? 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=1200&q=80');
+          $flightImage = $destinationImages[$destinationKey]
+            ?? $destinationImages[$originKey]
+            ?? $destinationImages['generic'];
         ?>
         <article class="col-md-6">
           <div class="card flight-card h-100 p-3">
-            <?php $img = $flightImage; $img_webp = preg_replace('/(\.(jpg|jpeg|png|svg))(\?.*)?$/i', '.webp', $img); $img_avif = preg_replace('/(\.(jpg|jpeg|png|svg))(\?.*)?$/i', '.avif', $img); ?>
-            <picture class="flight-card-media">
-              <source srcset="<?php echo htmlspecialchars($img_avif); ?>" type="image/avif">
-              <source srcset="<?php echo htmlspecialchars($img_webp); ?>" type="image/webp">
-              <img src="<?php echo htmlspecialchars($img); ?>" alt="Imagen de <?php echo htmlspecialchars($flight['destination']); ?>" loading="lazy">
-            </picture>
+            <?php $img = $flightImage; ?>
+            <div class="flight-card-media">
+              <img
+                src="<?php echo htmlspecialchars($img); ?>"
+                alt="Imagen de <?php echo htmlspecialchars($flight['destination']); ?>"
+                loading="lazy"
+                width="800"
+                height="450"
+                data-placeholder="1"
+                data-placeholder-label="<?php echo htmlspecialchars($flight['destination']); ?>"
+              >
+            </div>
             <div class="chip-row">
               <span class="chip">Vuelo #<?php echo (int) $flight['id']; ?></span>
               <span class="chip"><?php echo (int) round((strtotime($flight['arrival_time']) - strtotime($flight['departure_time'])) / 60); ?> min</span>

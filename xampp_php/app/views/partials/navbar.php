@@ -3,7 +3,6 @@ $user = current_user();
 $activePage = $_GET['page'] ?? 'home';
 ?>
 <div class="brand-strip" aria-hidden="true"></div>
-<a class="skip-link" href="#contenido-principal">Saltar al contenido principal</a>
 <nav class="navbar navbar-expand-lg navbar-light app-navbar" aria-label="Barra principal de navegacion">
   <div class="container">
     <a class="navbar-brand brand-with-plane" href="<?php echo BASE_URL; ?>/index.php?page=home">

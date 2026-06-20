@@ -144,6 +144,7 @@ switch ($page) {
             'user' => $homeUser,
             'airlines' => Airline::all(),
             'news' => News::all(),
+            'promotions' => Promotion::all(),
             'favorite_flights' => $favoriteFlights,
             'recent_reservations' => $recentReservations,
         ]);

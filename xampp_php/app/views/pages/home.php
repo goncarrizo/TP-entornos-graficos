@@ -14,9 +14,10 @@ $remoteMap = [
 
 foreach ($remoteMap as $k => $remote) {
   $localCandidates = [
-    __DIR__ . '/../../public/assets/images/' . 'PLACEHOLDER_' . $k . '.svg',
-    __DIR__ . '/../../public/assets/images/' . strtolower($k) . '.webp',
-    __DIR__ . '/../../public/assets/images/' . strtolower($k) . '.jpg',
+    __DIR__ . '/../../../public/assets/images/' . strtolower($k) . '.webp',
+    __DIR__ . '/../../../public/assets/images/' . strtolower($k) . '.jpg',
+    __DIR__ . '/../../../public/assets/images/' . strtolower($k) . '.avif',
+    __DIR__ . '/../../../public/assets/images/' . 'PLACEHOLDER_' . $k . '.svg',
   ];
 
   $found = null;
@@ -125,6 +126,36 @@ $newsImages = [
           <?php endif; ?>
         </div>
       </article>
+    </div>
+  </section>
+<?php endif; ?>
+
+<?php
+  $approvedPromotions = array_values(array_filter(
+      $promotions ?? [],
+      static fn(array $promotion): bool => (($promotion['status'] ?? '') === 'approved')
+  ));
+?>
+
+<?php if (!empty($approvedPromotions)): ?>
+  <section class="mb-4" aria-labelledby="promotions-home-title">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+      <h2 id="promotions-home-title" class="h4 section-title mb-0">Promociones disponibles</h2>
+      <span class="text-muted small">Ofertas vigentes</span>
+    </div>
+    <div class="row g-3">
+      <?php foreach ($approvedPromotions as $promotion): ?>
+        <article class="col-md-6 col-xl-4">
+          <div class="card p-3 h-100 border-success-subtle">
+            <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+              <h3 class="h6 mb-0"><?php echo htmlspecialchars($promotion['title']); ?></h3>
+              <span class="status-badge success">-<?php echo (float) $promotion['discount_percent']; ?>%</span>
+            </div>
+            <p class="small text-muted mb-2"><?php echo htmlspecialchars($promotion['airline_name'] ?? 'Aerolinea'); ?></p>
+            <p class="mb-0"><?php echo htmlspecialchars($promotion['description'] ?: 'Promocion vigente para esta aerolinea.'); ?></p>
+          </div>
+        </article>
+      <?php endforeach; ?>
     </div>
   </section>
 <?php endif; ?>

@@ -146,8 +146,11 @@ class FlightController
         $id = int_value($_POST['flight_id'] ?? 0);
 
         if ($id > 0) {
-            Flight::delete($id);
-            flash('ok', 'Vuelo eliminado.');
+            if (Flight::delete($id)) {
+                flash('ok', 'Vuelo eliminado.');
+            } else {
+                flash('error', 'No se pudo eliminar el vuelo.');
+            }
         }
 
         redirect_to('ceo');
