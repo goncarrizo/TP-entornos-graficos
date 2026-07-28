@@ -1,7 +1,3 @@
-DROP DATABASE IF EXISTS airarg_db;
-CREATE DATABASE airarg_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE airarg_db;
-
 CREATE TABLE users (
   id INT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(100) NOT NULL,
