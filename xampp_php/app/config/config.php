@@ -28,11 +28,19 @@ function normalize_base_url(string $path): string
 $basePath = normalize_base_url(dirname($_SERVER['SCRIPT_NAME']));
 define('BASE_URL', $basePath);
 // Use environment variables when available (for Docker / cloud deploys)
-define('DB_HOST', getenv('DB_HOST') !== false ? getenv('DB_HOST') : 'sql307.infinityfree.com');
+//define('DB_HOST', getenv('DB_HOST') !== false ? getenv('DB_HOST') : 'sql307.infinityfree.com');
+//define('DB_PORT', getenv('DB_PORT') !== false ? getenv('DB_PORT') : '3306');
+//define('DB_NAME', getenv('DB_NAME') !== false ? getenv('DB_NAME') : 'if0_42462097_airarg_db');
+//define('DB_USER', getenv('DB_USER') !== false ? getenv('DB_USER') : 'if0_42462097');
+//define('DB_PASS', getenv('DB_PASS') !== false ? getenv('DB_PASS') : 'XBznDTmdbNRijFF');
+
+
+// Pruebas en host
+define('DB_HOST', getenv('DB_HOST') !== false ? getenv('DB_HOST') : 'localhost');
 define('DB_PORT', getenv('DB_PORT') !== false ? getenv('DB_PORT') : '3306');
-define('DB_NAME', getenv('DB_NAME') !== false ? getenv('DB_NAME') : 'if0_42462097_airarg_db');
-define('DB_USER', getenv('DB_USER') !== false ? getenv('DB_USER') : 'if0_42462097');
-define('DB_PASS', getenv('DB_PASS') !== false ? getenv('DB_PASS') : 'XBznDTmdbNRijFF');
+define('DB_NAME', getenv('DB_NAME') !== false ? getenv('DB_NAME') : 'airarg_db'); // Cambiá este nombre si tu BD tiene otro
+define('DB_USER', getenv('DB_USER') !== false ? getenv('DB_USER') : 'root');
+define('DB_PASS', getenv('DB_PASS') !== false ? getenv('DB_PASS') : '');
 
 // Allow overriding the base URL with an env var (useful in cloud deployments)
 if (getenv('APP_URL') !== false && getenv('APP_URL') !== '') {

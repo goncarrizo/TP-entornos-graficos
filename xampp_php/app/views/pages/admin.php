@@ -33,7 +33,7 @@
             <div class="col-md-3"><input name="country" value="<?php echo htmlspecialchars($airline['country']); ?>" class="form-control" required></div>
             <div class="col-md-3 d-flex gap-2">
               <button class="btn btn-sm btn-warning" name="action" value="update_airline" type="submit">Editar</button>
-              <button class="btn btn-sm btn-danger" name="action" value="delete_airline" type="submit">Eliminar</button>
+              <button class="btn btn-sm btn-danger" name="action" value="delete_airline" type="submit" onclick="return confirm('¿Estás seguro de que deseas eliminar esta aerolínea? Esta acción no se puede deshacer.');">Eliminar</button>
             </div>
           </form>
         <?php endforeach; ?>
@@ -58,7 +58,7 @@
             </div>
             <div class="d-flex gap-2 justify-content-end mt-3">
               <button class="btn btn-sm btn-success" name="action" value="approve_airline_request" type="submit">Aprobar</button>
-              <button class="btn btn-sm btn-secondary" name="action" value="deny_airline_request" type="submit">Denegar</button>
+              <button class="btn btn-sm btn-secondary" name="action" value="deny_airline_request" type="submit" onclick="return confirm('¿Estás seguro de que deseas denegar esta aerolinea? Esta acción no se puede deshacer.');">Denegar</button>
             </div>
           </form>
         <?php endforeach; ?>
@@ -93,7 +93,7 @@
                 <form method="post" action="<?php echo BASE_URL; ?>/index.php?page=admin" style="margin: 0;">
                   <input type="hidden" name="action" value="reject_ceo">
                   <input type="hidden" name="ceo_id" value="<?php echo (int) $ceo['id']; ?>">
-                  <button class="btn btn-sm btn-danger w-100" type="submit">Rechazar</button>
+                  <button class="btn btn-sm btn-danger w-100" type="submit" onclick="return confirm('¿Estás seguro de que deseas rechazar este ceo? Esta acción no se puede deshacer.');">Rechazar</button>
                 </form>
               </div>
             </div>
@@ -123,7 +123,7 @@
               </div>
               <div class="d-flex gap-2">
                 <button class="btn btn-sm btn-success" name="action" value="approve_flight_request" type="submit">Aprobar</button>
-                <button class="btn btn-sm btn-secondary" name="action" value="deny_flight_request" type="submit">Denegar</button>
+                <button class="btn btn-sm btn-secondary" name="action" value="deny_flight_request" type="submit" onclick="return confirm('¿Estás seguro de que deseas denegar este vuelvo? Esta acción no se puede deshacer.');">Denegar</button>
               </div>
             </div>
           </form>
@@ -161,7 +161,7 @@
               <form method="post" action="<?php echo BASE_URL; ?>/index.php?page=admin">
                 <input type="hidden" name="action" value="deny_promotion">
                 <input type="hidden" name="promotion_id" value="<?php echo (int) $promotion['id']; ?>">
-                <button class="btn btn-sm btn-secondary" type="submit">Denegar</button>
+                <button class="btn btn-sm btn-secondary" type="submit" onclick="return confirm('¿Estás seguro de que deseas denegar esta promocion? Esta acción no se puede deshacer.');">Denegar</button>
               </form>
             </div>
           </div>
@@ -200,7 +200,7 @@
             </div>
             <div class="d-flex gap-2">
               <button class="btn btn-sm btn-warning" name="action" value="update_news" type="submit">Editar</button>
-              <button class="btn btn-sm btn-danger" name="action" value="delete_news" type="submit">Eliminar</button>
+              <button class="btn btn-sm btn-danger" name="action" value="delete_news" type="submit" onclick="return confirm('¿Estás seguro de que deseas eliminar esta novedad? Esta acción no se puede deshacer.');">Eliminar</button>
             </div>
           </form>
         <?php endforeach; ?>

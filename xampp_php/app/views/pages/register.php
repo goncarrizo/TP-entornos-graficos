@@ -45,8 +45,9 @@
           </div>
           <div class="col-md-6">
             <label for="reg_birthdate" class="form-label">Fecha de nacimiento</label>
-            <input id="reg_birthdate" name="birthdate" type="date" class="form-control" required>
+            <input id="reg_birthdate" name="birthdate" type="date" class="form-control" max="<?php echo date('Y-m-d'); ?>" required>
             <div class="invalid-feedback">La fecha de nacimiento es obligatoria.</div>
+            <div class="invalid-feedback">La fecha de nacimiento no puede ser posterior a hoy.</div>
           </div>
           <div class="col-md-6">
             <label for="reg_password" class="form-label">Clave (min 6)</label>

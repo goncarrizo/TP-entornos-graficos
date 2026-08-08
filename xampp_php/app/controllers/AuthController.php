@@ -36,6 +36,8 @@ class AuthController
         }
         if (!valid_birthdate($birthdate)) {
             $validationErrors[] = 'fecha de nacimiento';
+        } elseif ($birthdate > date('Y-m-d')) {
+            $validationErrors[] = 'fecha de nacimiento futura';
         }
         if (!valid_password($password)) {
             $validationErrors[] = 'clave';
