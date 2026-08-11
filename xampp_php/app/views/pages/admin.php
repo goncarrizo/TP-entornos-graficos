@@ -12,11 +12,29 @@
     <span class="status-badge secondary">CEOs pendientes: <?php echo count($pendingCEOs ?? []); ?></span>
     <div class="card p-3">
       <h2 id="airlines-admin-title" class="h5">1) ABMC Aerolineas</h2>
-      <form class="row g-2 needs-validation mb-3" method="post" action="<?php echo BASE_URL; ?>/index.php?page=admin" novalidate>
+      <?php
+        $airlineCreateErrors = $_SESSION['airline_create_errors'] ?? [];
+        $airlineCreateOld = $_SESSION['airline_create_old'] ?? [];
+        $airlineUpdateErrors = $_SESSION['airline_update_errors'] ?? [];
+        $airlineUpdateOld = $_SESSION['airline_update_old'] ?? [];
+      ?>
+      <form class="row g-2 needs-validation mb-3" method="post" action="<?php echo BASE_URL; ?>/index.php?page=admin" novalidate data-allow-server-validation="1">
         <input type="hidden" name="action" value="create_airline">
-        <div class="col-md-4"><label class="form-label" for="airline_name">Nombre</label><input id="airline_name" name="name" class="form-control" required></div>
-        <div class="col-md-3"><label class="form-label" for="airline_code">Codigo</label><input id="airline_code" name="code" class="form-control" required></div>
-        <div class="col-md-3"><label class="form-label" for="airline_country">Pais</label><input id="airline_country" name="country" class="form-control" required></div>
+        <div class="col-md-4">
+          <label class="form-label" for="airline_name">Nombre</label>
+          <input id="airline_name" name="name" class="form-control<?php echo isset($airlineCreateErrors['name']) ? ' is-invalid' : ''; ?>" value="<?php echo htmlspecialchars($airlineCreateOld['name'] ?? '', ENT_QUOTES, 'UTF-8'); ?>" required>
+          <?php if (isset($airlineCreateErrors['name'])): ?><div style="display:block; color:#dc3545; font-size:0.875rem; margin-top:0.25rem;">Campo obligatorio.</div><?php endif; ?>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label" for="airline_code">Codigo</label>
+          <input id="airline_code" name="code" class="form-control<?php echo isset($airlineCreateErrors['code']) ? ' is-invalid' : ''; ?>" value="<?php echo htmlspecialchars($airlineCreateOld['code'] ?? '', ENT_QUOTES, 'UTF-8'); ?>" required>
+          <?php if (isset($airlineCreateErrors['code'])): ?><div style="display:block; color:#dc3545; font-size:0.875rem; margin-top:0.25rem;">Campo obligatorio.</div><?php endif; ?>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label" for="airline_country">Pais</label>
+          <input id="airline_country" name="country" class="form-control<?php echo isset($airlineCreateErrors['country']) ? ' is-invalid' : ''; ?>" value="<?php echo htmlspecialchars($airlineCreateOld['country'] ?? '', ENT_QUOTES, 'UTF-8'); ?>" required>
+          <?php if (isset($airlineCreateErrors['country'])): ?><div style="display:block; color:#dc3545; font-size:0.875rem; margin-top:0.25rem;">Campo obligatorio.</div><?php endif; ?>
+        </div>
         <div class="col-md-2 d-grid align-self-end"><button class="btn btn-primary" type="submit">Crear</button></div>
       </form>
 
@@ -26,11 +44,21 @@
         </div>
       <?php else: ?>
         <?php foreach ($airlines as $airline): ?>
-          <form class="row g-2 border rounded p-2 mb-2" method="post" action="<?php echo BASE_URL; ?>/index.php?page=admin">
+          <?php $airlineErrors = $airlineUpdateErrors[(int) $airline['id']] ?? []; $airlineOld = $airlineUpdateOld[(int) $airline['id']] ?? []; ?>
+          <form class="row g-2 border rounded p-2 mb-2" method="post" action="<?php echo BASE_URL; ?>/index.php?page=admin" data-allow-server-validation="1">
             <input type="hidden" name="airline_id" value="<?php echo (int) $airline['id']; ?>">
-            <div class="col-md-4"><input name="name" value="<?php echo htmlspecialchars($airline['name']); ?>" class="form-control" required></div>
-            <div class="col-md-2"><input name="code" value="<?php echo htmlspecialchars($airline['code']); ?>" class="form-control" required></div>
-            <div class="col-md-3"><input name="country" value="<?php echo htmlspecialchars($airline['country']); ?>" class="form-control" required></div>
+            <div class="col-md-4">
+              <input name="name" value="<?php echo htmlspecialchars($airlineOld['name'] ?? $airline['name']); ?>" class="form-control<?php echo isset($airlineErrors['name']) ? ' is-invalid' : ''; ?>" required>
+              <?php if (isset($airlineErrors['name'])): ?><div style="display:block; color:#dc3545; font-size:0.875rem; margin-top:0.25rem;">Campo obligatorio.</div><?php endif; ?>
+            </div>
+            <div class="col-md-2">
+              <input name="code" value="<?php echo htmlspecialchars($airlineOld['code'] ?? $airline['code']); ?>" class="form-control<?php echo isset($airlineErrors['code']) ? ' is-invalid' : ''; ?>" required>
+              <?php if (isset($airlineErrors['code'])): ?><div style="display:block; color:#dc3545; font-size:0.875rem; margin-top:0.25rem;">Campo obligatorio.</div><?php endif; ?>
+            </div>
+            <div class="col-md-3">
+              <input name="country" value="<?php echo htmlspecialchars($airlineOld['country'] ?? $airline['country']); ?>" class="form-control<?php echo isset($airlineErrors['country']) ? ' is-invalid' : ''; ?>" required>
+              <?php if (isset($airlineErrors['country'])): ?><div style="display:block; color:#dc3545; font-size:0.875rem; margin-top:0.25rem;">Campo obligatorio.</div><?php endif; ?>
+            </div>
             <div class="col-md-3 d-flex gap-2">
               <button class="btn btn-sm btn-warning" name="action" value="update_airline" type="submit">Editar</button>
               <button class="btn btn-sm btn-danger" name="action" value="delete_airline" type="submit" onclick="return confirm('¿Estás seguro de que deseas eliminar esta aerolínea? Esta acción no se puede deshacer.');">Eliminar</button>
@@ -172,16 +200,108 @@
 
   <section class="col-lg-6" aria-labelledby="news-admin-title">
     <div class="card p-3">
-      <h2 id="news-admin-title" class="h5">3) ABMC Novedades</h2>
-      <form method="post" action="<?php echo BASE_URL; ?>/index.php?page=admin" class="mb-3 needs-validation" novalidate>
-        <input type="hidden" name="action" value="create_news">
-        <div class="mb-2"><label class="form-label" for="news_title">Titulo</label><input id="news_title" name="title" class="form-control" required></div>
-        <div class="mb-2"><label class="form-label" for="news_content">Contenido</label><textarea id="news_content" name="content" class="form-control" rows="3" required></textarea></div>
-        <div class="row g-2 mb-2">
-          <div class="col-md-6"><label class="form-label" for="news_start">Fecha inicio</label><input id="news_start" name="start_date" type="date" class="form-control"></div>
-          <div class="col-md-6"><label class="form-label" for="news_end">Fecha fin</label><input id="news_end" name="end_date" type="date" class="form-control"></div>
-        </div>
-        <button class="btn btn-primary" type="submit">Publicar</button>
+      <h2 id="news-admin-title" class="h5"> 3) ABMC Novedades</h2>
+
+      <form
+          method="post"
+          action="<?php echo BASE_URL; ?>/index.php?page=admin"
+          class="mb-3 needs-validation"
+          novalidate
+          data-allow-server-validation="1"
+      >
+          <input type="hidden" name="action" value="create_news">
+
+          <!-- Título -->
+          <div class="mb-2">
+              <label class="form-label" for="news_title">Título</label>
+
+              <input
+                  id="news_title"
+                  name="title"
+                  type="text"
+                  class="form-control<?php echo isset($newsErrors['title']) ? ' is-invalid' : ''; ?>"
+                  value="<?php echo htmlspecialchars($newsOldValues['title'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
+                  required
+              >
+
+              <?php if (isset($newsErrors['title'])): ?>
+                  <div style="display:block; color:#dc3545; font-size:0.875rem; margin-top:0.25rem;">
+                      <?php echo htmlspecialchars($newsErrors['title'], ENT_QUOTES, 'UTF-8'); ?>
+                  </div>
+              <?php endif; ?>
+          </div>
+
+          <!-- Contenido -->
+          <div class="mb-2">
+              <label class="form-label" for="news_content">Contenido</label>
+
+              <textarea
+                  id="news_content"
+                  name="content"
+                  class="form-control<?php echo isset($newsErrors['content']) ? ' is-invalid' : ''; ?>"
+                  rows="3"
+                  required
+              ><?php echo htmlspecialchars($newsOldValues['content'] ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
+
+              <?php if (isset($newsErrors['content'])): ?>
+                  <div style="display:block; color:#dc3545; font-size:0.875rem; margin-top:0.25rem;">
+                      <?php echo htmlspecialchars($newsErrors['content'], ENT_QUOTES, 'UTF-8'); ?>
+                  </div>
+              <?php endif; ?>
+          </div>
+
+          <!-- Fechas -->
+          <div class="row g-2 mb-2">
+
+              <!-- Fecha inicio -->
+              <div class="col-md-6">
+                  <label class="form-label" for="news_start">
+                      Fecha inicio
+                  </label>
+
+                  <input
+                      id="news_start"
+                      name="start_date"
+                      type="date"
+                      class="form-control<?php echo isset($newsErrors['start_date']) ? ' is-invalid' : ''; ?>"
+                      value="<?php echo htmlspecialchars($newsOldValues['start_date'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
+                      required
+                  >
+
+                  <?php if (isset($newsErrors['start_date'])): ?>
+                      <div style="display:block; color:#dc3545; font-size:0.875rem; margin-top:0.25rem;">
+                          <?php echo htmlspecialchars($newsErrors['start_date'], ENT_QUOTES, 'UTF-8'); ?>
+                      </div>
+                  <?php endif; ?>
+              </div>
+
+              <!-- Fecha fin -->
+              <div class="col-md-6">
+                  <label class="form-label" for="news_end">
+                      Fecha fin
+                  </label>
+
+                  <input
+                      id="news_end"
+                      name="end_date"
+                      type="date"
+                      class="form-control<?php echo isset($newsErrors['end_date']) ? ' is-invalid' : ''; ?>"
+                      value="<?php echo htmlspecialchars($newsOldValues['end_date'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
+                      required
+                  >
+
+                  <?php if (isset($newsErrors['end_date'])): ?>
+                      <div style="display:block; color:#dc3545; font-size:0.875rem; margin-top:0.25rem;">
+                          <?php echo htmlspecialchars($newsErrors['end_date'], ENT_QUOTES, 'UTF-8'); ?>
+                      </div>
+                  <?php endif; ?>
+              </div>
+
+          </div>
+
+          <button class="btn btn-primary" type="submit">
+              Publicar
+          </button>
       </form>
 
       <?php if (empty($news)): ?>

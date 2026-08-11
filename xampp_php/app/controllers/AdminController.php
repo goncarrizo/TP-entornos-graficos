@@ -20,7 +20,7 @@ class AdminController
         exit;
     }
 
-    public static function panel(): void
+    public static function panel(?array $newsErrors = null, array $newsOld = []): void
     {
         require_role('admin');
 
@@ -32,6 +32,17 @@ class AdminController
         $pendingAirlineRequests = AirlineRequest::allPending();
         $pendingFlightRequests = FlightRequest::allPending();
         $pendingCEOs = User::getPendingCEOs();
+
+        if ($newsErrors !== null) {
+            $_SESSION['news_errors'] = $newsErrors;
+            $_SESSION['news_old'] = $newsOld;
+            $GLOBALS['news_errors'] = $newsErrors;
+            $GLOBALS['news_old_values'] = $newsOld;
+        } else {
+            $GLOBALS['news_errors'] = [];
+            $GLOBALS['news_old_values'] = [];
+            unset($_SESSION['news_errors'], $_SESSION['news_old']);
+        }
 
         view('admin', compact('airlines', 'promotions', 'news', 'reports', 'sales', 'pendingAirlineRequests', 'pendingFlightRequests', 'pendingCEOs'));
     }
@@ -164,10 +175,28 @@ class AdminController
         $code = strtoupper(clean_text($_POST['code'] ?? ''));
         $country = clean_text($_POST['country'] ?? '');
 
-        if ($name === '' || $code === '' || $country === '') {
-            flash('error', 'Completa todos los campos de aerolinea.');
+        $errors = [];
+        if ($name === '') {
+            $errors['name'] = 'Campo obligatorio.';
+        }
+        if ($code === '') {
+            $errors['code'] = 'Campo obligatorio.';
+        }
+        if ($country === '') {
+            $errors['country'] = 'Campo obligatorio.';
+        }
+
+        if (!empty($errors)) {
+            $_SESSION['airline_create_errors'] = $errors;
+            $_SESSION['airline_create_old'] = [
+                'name' => $name,
+                'code' => $code,
+                'country' => $country,
+            ];
             redirect_to('admin');
         }
+
+        unset($_SESSION['airline_create_errors'], $_SESSION['airline_create_old']);
 
         Airline::create($name, $code, $country);
         flash('ok', 'Aerolinea creada.');
@@ -222,10 +251,28 @@ class AdminController
         $code = strtoupper(clean_text($_POST['code'] ?? ''));
         $country = clean_text($_POST['country'] ?? '');
 
-        if ($id < 1 || $name === '' || $code === '' || $country === '') {
-            flash('error', 'Datos invalidos para actualizar aerolinea.');
+        $errors = [];
+        if ($name === '') {
+            $errors['name'] = 'Campo obligatorio.';
+        }
+        if ($code === '') {
+            $errors['code'] = 'Campo obligatorio.';
+        }
+        if ($country === '') {
+            $errors['country'] = 'Campo obligatorio.';
+        }
+
+        if ($id < 1 || !empty($errors)) {
+            $_SESSION['airline_update_errors'][(int) $id] = $errors;
+            $_SESSION['airline_update_old'][(int) $id] = [
+                'name' => $name,
+                'code' => $code,
+                'country' => $country,
+            ];
             redirect_to('admin');
         }
+
+        unset($_SESSION['airline_update_errors'][(int) $id], $_SESSION['airline_update_old'][(int) $id]);
 
         Airline::update($id, $name, $code, $country);
         flash('ok', 'Aerolinea actualizada.');
@@ -268,18 +315,95 @@ class AdminController
     public static function createNews(): void
     {
         require_role('admin');
+
         $title = clean_text($_POST['title'] ?? '');
         $content = clean_text($_POST['content'] ?? '');
-        $startDate = trim((string) ($_POST['start_date'] ?? '')) ?: null;
-        $endDate = trim((string) ($_POST['end_date'] ?? '')) ?: null;
 
-        if ($title === '' || $content === '') {
-            flash('error', 'Completa titulo y contenido.');
-            redirect_to('admin');
+        // Dejamos las fechas como string vacío si no fueron ingresadas
+        $startDate = trim((string) ($_POST['start_date'] ?? ''));
+        $endDate = trim((string) ($_POST['end_date'] ?? ''));
+
+        $errors = [];
+
+        // =========================
+        // TÍTULO
+        // =========================
+        if ($title === '') {
+            $errors['title'] = 'campo obligatorio';
+        } elseif (!preg_match('/\p{L}/u', $title)) {
+            $errors['title'] = 'Título inválido.';
         }
 
-        News::create($title, $content, $startDate, $endDate);
+        // =========================
+        // CONTENIDO
+        // =========================
+        if ($content === '') {
+            $errors['content'] = 'campo obligatorio';
+        } elseif (!preg_match('/\p{L}/u', $content)) {
+            $errors['content'] = 'Contenido inválido.';
+        }
+
+        // =========================
+        // FECHA DE INICIO
+        // =========================
+        if ($startDate === '') {
+            $errors['start_date'] = 'campo obligatorio';
+        } elseif (!valid_news_date($startDate)) {
+            $errors['start_date'] = 'La fecha de inicio no es válida.';
+        }
+
+        // =========================
+        // FECHA DE FIN
+        // =========================
+        if ($endDate === '') {
+            $errors['end_date'] = 'campo obligatorio';
+        } elseif (!valid_news_date($endDate)) {
+            $errors['end_date'] = 'La fecha de fin no es válida.';
+        }
+
+        // =========================
+        // COMPARAR FECHAS
+        // =========================
+        if (
+            !isset($errors['start_date']) &&
+            !isset($errors['end_date']) &&
+            $endDate < $startDate
+        ) {
+            $errors['end_date'] = 'La fecha de fin no puede ser anterior a la fecha de inicio.';
+        }
+
+        // =========================
+        // SI HAY ERRORES
+        // =========================
+        if (!empty($errors)) {
+            self::panel($errors, [
+                'title' => $title,
+                'content' => $content,
+                'start_date' => $startDate,
+                'end_date' => $endDate,
+            ]);
+            exit;
+        }
+
+        // =========================
+        // CREAR NOVEDAD
+        // =========================
+        News::create(
+            $title,
+            $content,
+            $startDate,
+            $endDate
+        );
+
+        unset(
+            $_SESSION['news_errors'],
+            $_SESSION['news_old']
+        );
+        $GLOBALS['news_errors'] = [];
+        $GLOBALS['news_old_values'] = [];
+
         flash('ok', 'Novedad publicada.');
+
         redirect_to('admin');
     }
 

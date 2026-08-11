@@ -17,7 +17,8 @@ function valid_email(string $email): bool
 
 function valid_name(string $value): bool
 {
-    return (bool) preg_match('/^[\p{L}][\p{L}\s\'\.-]{1,79}$/u', trim($value));
+    $trimmed = trim($value);
+    return $trimmed !== '' && (bool) preg_match('/^[\p{L}]{2,}(?:[\s\'\.-][\p{L}]{2,})*$/u', $trimmed);
 }
 
 function valid_phone(string $value): bool
@@ -35,6 +36,13 @@ function valid_birthdate(string $value): bool
     return (bool) preg_match('/^\d{4}-\d{2}-\d{2}$/', trim($value));
 }
 
+function valid_email_allowed_domain(string $email): bool
+{
+    $allowedDomains = ['gmail.com.ar', 'outlook.com', 'outlook.com.ar'];
+    $domain = strtolower(substr(strrchr($email, '@'), 1) ?: '');
+    return in_array($domain, $allowedDomains, true);
+}
+
 function valid_password(string $value): bool
 {
     return strlen(trim($value)) >= 6;
@@ -43,4 +51,12 @@ function valid_password(string $value): bool
 function int_value($value): int
 {
     return (int) filter_var($value, FILTER_SANITIZE_NUMBER_INT);
+}
+
+function valid_news_date(string $date): bool
+{
+    $dateObject = DateTime::createFromFormat('Y-m-d', $date);
+
+    return $dateObject !== false
+        && $dateObject->format('Y-m-d') === $date;
 }

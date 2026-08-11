@@ -13,87 +13,164 @@ class AuthController
         $password = (string) ($_POST['password'] ?? '');
         $passwordConfirm = (string) ($_POST['password_confirm'] ?? '');
         $role = clean_text($_POST['role'] ?? 'customer');
+        $airlineId = int_value($_POST['airline_id'] ?? 0);
 
         $fullName = trim($name . ' ' . $lastname);
 
         $passwordsMatch = $password !== '' && $password === $passwordConfirm;
 
-        $validationErrors = [];
-        if (!valid_name($name)) {
-            $validationErrors[] = 'nombre';
+        /*
+        * Guardamos los datos que se pueden recuperar si hay errores.
+        * NO guardamos las contraseñas.
+        */
+        $_SESSION['register_old'] = [
+            'name' => $name,
+            'lastname' => $lastname,
+            'email' => $email,
+            'phone' => $phone,
+            'document' => $document,
+            'birthdate' => $birthdate,
+            'role' => $role,
+            'airline_id' => $airlineId > 0 ? $airlineId : '',
+        ];
+
+        $errors = [];
+
+        // Nombre
+        if ($name === '') {
+            $errors['name'] = 'El nombre es obligatorio.';
+        } elseif (!valid_name($name)) {
+            $errors['name'] = 'Ingresa un nombre valido.';
         }
+
+        // Apellido
         if (!valid_name($lastname)) {
-            $validationErrors[] = 'apellido';
+            $errors['lastname'] = 'Ingresa un apellido valido.';
         }
-        if (!valid_email($email)) {
-            $validationErrors[] = 'email';
+
+        // Email
+        if ($email === '') {
+            $errors['email'] = 'Campo obligatorio.';
+        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $errors['email'] = 'Ingresa un email válido.';
+        } elseif (!preg_match('/^[A-Za-z0-9._%+-]+@(gmail\.com|outlook\.com|outlook\.com\.ar)$/i', $email)) {
+            $errors['email'] = 'El email debe terminar en @gmail.com, @outlook.com o @outlook.com.ar.';
         }
+
+        // Telefono
         if (!valid_phone($phone)) {
-            $validationErrors[] = 'teléfono';
+            $errors['phone'] = 'Ingresa un telefono valido.';
         }
+
+        // Documento
         if (!valid_document($document)) {
-            $validationErrors[] = 'documento';
+            $errors['document'] = 'Ingresa un documento valido (7 a 10 digitos).';
         }
+
+        // Fecha de nacimiento
         if (!valid_birthdate($birthdate)) {
-            $validationErrors[] = 'fecha de nacimiento';
-        } elseif ($birthdate > date('Y-m-d')) {
-            $validationErrors[] = 'fecha de nacimiento futura';
+            $errors['birthdate'] = 'Ingresa una fecha de nacimiento valida.';
         }
+
+        // Clave
         if (!valid_password($password)) {
-            $validationErrors[] = 'clave';
+            $errors['password'] = 'La clave debe tener al menos 6 caracteres.';
         }
+
+        // Confirmación de clave
         if (!$passwordsMatch) {
-            $validationErrors[] = 'confirmación de clave';
+            $errors['password_confirm'] = 'Las claves no coinciden.';
         }
 
-        if (!empty($validationErrors)) {
-            $errorText = 'Revisa los datos del registro antes de continuar. Campos inválidos: ' . implode(', ', $validationErrors) . '.';
-            flash('error', $errorText);
+        // Rol
+        if ($role !== 'customer' && $role !== 'ceo') {
+            $errors['role'] = 'Selecciona un tipo de cuenta valido.';
+        }
+
+        // Aerolínea para CEO
+        if ($role === 'ceo') {
+            if ($airlineId < 1) {
+                $errors['airline_id'] = 'Debes seleccionar una aerolinea.';
+            } elseif (!Airline::findById($airlineId)) {
+                $errors['airline_id'] = 'La aerolinea seleccionada no es valida.';
+            } elseif (User::findByAirlineAndRole($airlineId, 'ceo')) {
+                $errors['airline_id'] = 'Ya existe un CEO asignado a esa aerolinea.';
+            }
+        }
+
+        /*
+        * Si existen errores, los guardamos en sesión y volvemos
+        * al formulario.
+        */
+        if (!empty($errors)) {
+            $_SESSION['register_errors'] = $errors;
+
+            flash('error', 'Revisa los campos marcados para continuar.');
             redirect_to('register');
         }
 
+        /*
+        * Verificamos el email después de las validaciones.
+        */
         if (User::findByEmail($email)) {
-            flash('error', 'El email ya existe.');
+            $_SESSION['register_errors'] = [
+                'email' => 'Este email ya está registrado.'
+            ];
+
+            flash('error', 'Revisa el campo email.');
             redirect_to('register');
         }
 
-        // Use password_hash (bcrypt/argon2 depending on PHP) for secure password storage.
+        // Password segura
         $hash = password_hash($password, PASSWORD_DEFAULT);
 
-        $airlineId = null;
         $isApproved = true;
 
         if ($role === 'ceo') {
-            $airlineId = int_value($_POST['airline_id'] ?? 0);
-            if ($airlineId < 1) {
-                flash('error', 'Selecciona la aerolinea para el CEO.');
-                redirect_to('register');
-            }
-            if (!Airline::findById($airlineId)) {
-                flash('error', 'Aerolinea invalida para CEO.');
-                redirect_to('register');
-            }
-            if (User::findByAirlineAndRole($airlineId, 'ceo')) {
-                flash('error', 'Ya existe un CEO asignado a esa aerolinea.');
-                redirect_to('register');
-            }
-            // CEOs created by non-admins require approval
+            // Los CEOs creados por usuarios que no son administradores
+            // requieren aprobación.
             $isApproved = is_logged_in() && has_role('admin');
-        } else if ($role !== 'customer') {
-            // Only customer or ceo roles allowed for registration
-            $role = 'customer';
+        } else {
+            $airlineId = null;
         }
 
-        User::create($fullName, $email, $phone, $document, $birthdate, $hash, $role, $airlineId, $isApproved);
+        User::create(
+            $fullName,
+            $email,
+            $phone,
+            $document,
+            $birthdate,
+            $hash,
+            $role,
+            $airlineId,
+            $isApproved
+        );
+
+        /*
+        * El registro fue exitoso, por lo tanto ya no necesitamos
+        * mantener los datos anteriores.
+        */
+        unset($_SESSION['register_old'], $_SESSION['register_errors']);
 
         if ($role === 'ceo' && !$isApproved) {
-            flash('ok', 'Solicitud de CEO enviada. Debes esperar la aprobación del administrador para acceder.');
+            flash(
+                'ok',
+                'Solicitud de CEO enviada. Debes esperar la aprobación del administrador para acceder.'
+            );
         } else {
-            $mailSent = send_app_mail($email, 'Registro AirARG', "Hola $fullName, tu cuenta fue creada correctamente.");
+            $mailSent = send_app_mail(
+                $email,
+                'Registro AirARG',
+                "Hola $fullName, tu cuenta fue creada correctamente."
+            );
+
             if ($mailSent) {
                 flash('ok', 'Registro exitoso. Ya podes iniciar sesion.');
             } else {
-                flash('ok', 'Registro exitoso. Ya podes iniciar sesion. El correo de bienvenida no pudo enviarse desde este entorno.');
+                flash(
+                    'ok',
+                    'Registro exitoso. Ya podes iniciar sesion. El correo de bienvenida no pudo enviarse desde este entorno.'
+                );
             }
         }
 

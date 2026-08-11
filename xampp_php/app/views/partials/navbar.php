@@ -105,10 +105,10 @@ $activePage = $_GET['page'] ?? 'home';
 
   <?php $error = flash('error'); ?>
   <?php if (is_string($error) && trim($error) !== ''): ?>
-    <div class="alert alert-danger flash-inline" role="alert" aria-live="assertive">
-      <span class="flash-badge error" aria-hidden="true">!</span>
+    <div class="alert alert-warning flash-inline" role="alert">
+      <span class="flash-badge warning" aria-hidden="true">!</span>
       <div class="flash-content">
-        <strong>Atencion</strong>
+        <strong>Atención</strong>
         <span><?php echo htmlspecialchars($error); ?></span>
       </div>
     </div>
