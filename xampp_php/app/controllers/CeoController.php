@@ -59,7 +59,7 @@ class CeoController
         exit;
     }
 
-    public static function panel(): void
+    public static function panel(?array $flightErrors = null, array $flightOld = [], ?array $promotionErrors = null, array $promotionOld = [], ?array $airlineRequestErrors = null, array $airlineRequestOld = [], ?array $flightUpdateErrors = null, array $flightUpdateOld = [], ?array $promotionUpdateErrors = null, array $promotionUpdateOld = []): void
     {
         require_role('ceo');
 
@@ -85,7 +85,84 @@ class CeoController
         $pendingFlightRequests = FlightRequest::byUser((int) $user['id']);
         $pendingReservations = Reservation::allPendingByAirline($airlineId);
 
-        view('ceo', compact('flights', 'airlines', 'promotions', 'sales', 'occupancy', 'pendingAirlineRequests', 'pendingFlightRequests', 'pendingReservations'));
+        if ($flightErrors !== null) {
+            $_SESSION['create_flight_errors'] = $flightErrors;
+            $_SESSION['create_flight_old'] = $flightOld;
+            $GLOBALS['create_flight_errors'] = $flightErrors;
+            $GLOBALS['create_flight_old_values'] = $flightOld;
+        } else {
+            $flightErrors = $_SESSION['create_flight_errors'] ?? [];
+            $flightOld = $_SESSION['create_flight_old'] ?? [];
+            $GLOBALS['create_flight_errors'] = $flightErrors;
+            $GLOBALS['create_flight_old_values'] = $flightOld;
+        }
+
+        if ($promotionErrors !== null) {
+            $_SESSION['create_promotion_errors'] = $promotionErrors;
+            $_SESSION['create_promotion_old'] = $promotionOld;
+            $GLOBALS['create_promotion_errors'] = $promotionErrors;
+            $GLOBALS['create_promotion_old_values'] = $promotionOld;
+        } else {
+            $preservePromotionErrors = !empty($_SESSION['preserve_promotion_errors']);
+            if ($preservePromotionErrors) {
+                unset($_SESSION['preserve_promotion_errors']);
+            }
+
+            if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'GET' && !$preservePromotionErrors) {
+                unset($_SESSION['create_promotion_errors']);
+                $promotionErrors = [];
+            } else {
+                $promotionErrors = $_SESSION['create_promotion_errors'] ?? [];
+            }
+
+            $promotionOld = $_SESSION['create_promotion_old'] ?? [];
+            $GLOBALS['create_promotion_errors'] = $promotionErrors;
+            $GLOBALS['create_promotion_old_values'] = $promotionOld;
+        }
+
+        if ($airlineRequestErrors !== null) {
+            $_SESSION['create_airline_request_errors'] = $airlineRequestErrors;
+            $_SESSION['create_airline_request_old'] = $airlineRequestOld;
+            $GLOBALS['create_airline_request_errors'] = $airlineRequestErrors;
+            $GLOBALS['create_airline_request_old_values'] = $airlineRequestOld;
+        } else {
+            $airlineRequestErrors = $_SESSION['create_airline_request_errors'] ?? [];
+            $airlineRequestOld = $_SESSION['create_airline_request_old'] ?? [];
+            $GLOBALS['create_airline_request_errors'] = $airlineRequestErrors;
+            $GLOBALS['create_airline_request_old_values'] = $airlineRequestOld;
+        }
+
+        if ($flightUpdateErrors !== null) {
+            $_SESSION['flight_update_errors'] = $flightUpdateErrors;
+            $_SESSION['flight_update_old'] = $flightUpdateOld;
+            $GLOBALS['flight_update_errors'] = $flightUpdateErrors;
+            $GLOBALS['flight_update_old_values'] = $flightUpdateOld;
+        } else {
+            $flightUpdateErrors = $_SESSION['flight_update_errors'] ?? [];
+            $flightUpdateOld = $_SESSION['flight_update_old'] ?? [];
+            $GLOBALS['flight_update_errors'] = $flightUpdateErrors;
+            $GLOBALS['flight_update_old_values'] = $flightUpdateOld;
+        }
+
+        if ($promotionUpdateErrors !== null) {
+            $_SESSION['promotion_update_errors'] = $promotionUpdateErrors;
+            $_SESSION['promotion_update_old'] = $promotionUpdateOld;
+            $GLOBALS['promotion_update_errors'] = $promotionUpdateErrors;
+            $GLOBALS['promotion_update_old_values'] = $promotionUpdateOld;
+        } else {
+            if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'GET') {
+                unset($_SESSION['promotion_update_errors'], $_SESSION['promotion_update_old']);
+                $promotionUpdateErrors = [];
+                $promotionUpdateOld = [];
+            } else {
+                $promotionUpdateErrors = $_SESSION['promotion_update_errors'] ?? [];
+                $promotionUpdateOld = $_SESSION['promotion_update_old'] ?? [];
+            }
+            $GLOBALS['promotion_update_errors'] = $promotionUpdateErrors;
+            $GLOBALS['promotion_update_old_values'] = $promotionUpdateOld;
+        }
+
+        view('ceo', compact('flights', 'airlines', 'promotions', 'sales', 'occupancy', 'pendingAirlineRequests', 'pendingFlightRequests', 'pendingReservations', 'flightErrors', 'flightOld', 'promotionErrors', 'promotionOld', 'airlineRequestErrors', 'airlineRequestOld', 'flightUpdateErrors', 'flightUpdateOld', 'promotionUpdateErrors', 'promotionUpdateOld'));
     }
 
     public static function approveReservation(): void
@@ -146,9 +223,26 @@ class CeoController
         $country = clean_text($_POST['country'] ?? '');
         $userId = (int) current_user()['id'];
 
-        if ($name === '' || $code === '' || $country === '') {
-            flash('error', 'Completa todos los campos de la propuesta de aerolinea.');
-            redirect_to('ceo');
+        $errors = [];
+
+        if ($name === '') {
+            $errors['name'] = 'Campo obligatorio.';
+        }
+        if ($code === '') {
+            $errors['code'] = 'Campo obligatorio.';
+        }
+        if ($country === '') {
+            $errors['country'] = 'Campo obligatorio.';
+        }
+
+        if (!empty($errors)) {
+            flash('error', 'Revisa los campos marcados para continuar.');
+            CeoController::panel([], [], [], [], $errors, [
+                'name' => $name,
+                'code' => $code,
+                'country' => $country,
+            ]);
+            exit;
         }
 
         if (!preg_match('/^[A-Z0-9]{2,10}$/', $code)) {
@@ -162,6 +256,9 @@ class CeoController
         }
 
         AirlineRequest::create($name, $code, $country, $userId);
+        unset($_SESSION['create_airline_request_errors'], $_SESSION['create_airline_request_old']);
+        $GLOBALS['create_airline_request_errors'] = [];
+        $GLOBALS['create_airline_request_old_values'] = [];
         flash('ok', 'Tu propuesta de aerolinea fue enviada para revision admin.');
         redirect_to('ceo');
     }
@@ -176,9 +273,27 @@ class CeoController
         $description = clean_text($_POST['description'] ?? '');
         $discount = (float) ($_POST['discount_percent'] ?? 0);
 
-        if ($airlineId < 1 || $title === '' || $discount <= 0) {
-            flash('error', 'Datos invalidos para promocion.');
-            redirect_to('ceo');
+        $errors = [];
+
+        if ($airlineId < 1) {
+            $errors['airline_id'] = 'Campo obligatorio.';
+        }
+        if ($title === '') {
+            $errors['title'] = 'Campo obligatorio.';
+        }
+        if ($discount <= 0) {
+            $errors['discount_percent'] = 'Campo obligatorio.';
+        }
+
+        if (!empty($errors)) {
+            flash('error', 'Revisa los campos marcados para continuar.');
+            CeoController::panel([], [], $errors, [
+                'airline_id' => $airlineId,
+                'title' => $title,
+                'description' => $description,
+                'discount_percent' => $discount,
+            ]);
+            exit;
         }
 
         // Ensure CEO can only create promotions for their assigned airline
@@ -188,6 +303,9 @@ class CeoController
         }
 
         Promotion::create($airlineId, $title, $description, $discount);
+        unset($_SESSION['create_promotion_errors'], $_SESSION['create_promotion_old']);
+        $GLOBALS['create_promotion_errors'] = [];
+        $GLOBALS['create_promotion_old_values'] = [];
         flash('ok', 'Promocion creada y enviada para aprobacion.');
         redirect_to('ceo');
     }
@@ -206,10 +324,36 @@ class CeoController
         // CEOs are not allowed to activate promotions directly; only admins can approve/activate.
         $isActive = 0;
 
-        if ($id < 1 || $airlineId < 1 || $title === '' || $discount <= 0) {
-            flash('error', 'Datos invalidos para actualizar promocion.');
-            redirect_to('ceo');
+        $errors = [];
+
+        if ($id < 1) {
+            $errors['id'] = 'Campo obligatorio.';
         }
+        if ($airlineId < 1) {
+            $errors['airline_id'] = 'Campo obligatorio.';
+        }
+        if ($title === '') {
+            $errors['title'] = 'Campo obligatorio.';
+        }
+        if ($discount <= 0) {
+            $errors['discount_percent'] = 'Campo obligatorio.';
+        }
+
+        if (!empty($errors)) {
+            flash('error', 'Revisa los campos marcados para continuar.');
+            CeoController::panel([], [], [], [], [], [], [], [], [
+                $id => $errors,
+            ], [
+                $id => [
+                    'airline_id' => $airlineId,
+                    'title' => $title,
+                    'description' => $description,
+                    'discount_percent' => $discount,
+                ],
+            ]);
+            exit;
+        }
+
         // Ensure CEO can only update promotions for their assigned airline
         if ($userAirlineId < 1 || $airlineId !== $userAirlineId) {
             flash('error', 'No autorizado para editar promociones de esa aerolinea.');
@@ -217,6 +361,9 @@ class CeoController
         }
 
         Promotion::update($id, $airlineId, $title, $description, $discount, $isActive);
+        unset($_SESSION['promotion_update_errors'], $_SESSION['promotion_update_old']);
+        $GLOBALS['promotion_update_errors'] = [];
+        $GLOBALS['promotion_update_old_values'] = [];
         flash('ok', 'Promocion actualizada.');
         redirect_to('ceo');
     }

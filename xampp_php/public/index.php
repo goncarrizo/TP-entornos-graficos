@@ -16,6 +16,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         flash('error', 'Token CSRF invalido o inexistente.');
         redirect_to('home');
     }
+
+    $postAction = $_POST['action'] ?? null;
+    if ($postAction && $postAction !== 'create_promotion') {
+        $_SESSION['preserve_promotion_errors'] = true;
+    }
 }
 
 if ($action) {

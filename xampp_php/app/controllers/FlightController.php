@@ -82,9 +82,41 @@ class FlightController
             'submitted_by' => (int) current_user()['id'],
         ];
 
-        if ($data['airline_id'] < 1 || $data['origin'] === '' || $data['destination'] === '' || $data['departure_time'] === '' || $data['arrival_time'] === '' || $data['price'] <= 0 || $data['total_seats'] < 1) {
-            flash('error', 'Datos invalidos para solicitar un nuevo vuelo.');
-            redirect_to('ceo');
+        $errors = [];
+        if ($data['airline_id'] < 1) {
+            $errors['airline_id'] = 'Campo obligatorio.';
+        }
+        if ($data['origin'] === '') {
+            $errors['origin'] = 'Campo obligatorio.';
+        }
+        if ($data['destination'] === '') {
+            $errors['destination'] = 'Campo obligatorio.';
+        }
+        if ($data['departure_time'] === '') {
+            $errors['departure_time'] = 'Campo obligatorio.';
+        }
+        if ($data['arrival_time'] === '') {
+            $errors['arrival_time'] = 'Campo obligatorio.';
+        }
+        if ($data['price'] <= 0) {
+            $errors['price'] = 'Campo obligatorio.';
+        }
+        if ($data['total_seats'] < 1) {
+            $errors['total_seats'] = 'Campo obligatorio.';
+        }
+
+        if (!empty($errors)) {
+            flash('error', 'Revisa los campos marcados para continuar.');
+            CeoController::panel($errors, [
+                'airline_id' => $data['airline_id'],
+                'origin' => $data['origin'],
+                'destination' => $data['destination'],
+                'departure_time' => $data['departure_time'],
+                'arrival_time' => $data['arrival_time'],
+                'price' => $data['price'],
+                'total_seats' => $data['total_seats'],
+            ]);
+            exit;
         }
 
         if (Flight::existsByDetails($data)) {
@@ -98,6 +130,9 @@ class FlightController
         }
 
         FlightRequest::create($data);
+        unset($_SESSION['create_flight_errors'], $_SESSION['create_flight_old']);
+        $GLOBALS['create_flight_errors'] = [];
+        $GLOBALS['create_flight_old_values'] = [];
         flash('ok', 'Solicitud de vuelo enviada para revision admin.');
         redirect_to('ceo');
     }
@@ -117,9 +152,45 @@ class FlightController
             'total_seats' => int_value($_POST['total_seats'] ?? 0),
         ];
 
-        if ($id < 1 || $data['airline_id'] < 1 || $data['origin'] === '' || $data['destination'] === '' || $data['total_seats'] < 1) {
-            flash('error', 'Datos invalidos para actualizar vuelo.');
-            redirect_to('ceo');
+        $errors = [];
+        if ($id < 1) {
+            $errors['id'] = 'Vuelo inválido.';
+        }
+        if ($data['airline_id'] < 1) {
+            $errors['airline_id'] = 'Campo obligatorio.';
+        }
+        if ($data['origin'] === '') {
+            $errors['origin'] = 'Campo obligatorio.';
+        }
+        if ($data['destination'] === '') {
+            $errors['destination'] = 'Campo obligatorio.';
+        }
+        if ($data['departure_time'] === '') {
+            $errors['departure_time'] = 'Campo obligatorio.';
+        }
+        if ($data['arrival_time'] === '') {
+            $errors['arrival_time'] = 'Campo obligatorio.';
+        }
+        if ($data['price'] <= 0) {
+            $errors['price'] = 'Campo obligatorio.';
+        }
+        if ($data['total_seats'] < 1) {
+            $errors['total_seats'] = 'Campo obligatorio.';
+        }
+
+        if (!empty($errors)) {
+            flash('error', 'Revisa los campos marcados para continuar.');
+            CeoController::panel([], [], [], [], [], [], $errors, [
+                'id' => $id,
+                'airline_id' => $data['airline_id'],
+                'origin' => $data['origin'],
+                'destination' => $data['destination'],
+                'departure_time' => $data['departure_time'],
+                'arrival_time' => $data['arrival_time'],
+                'price' => $data['price'],
+                'total_seats' => $data['total_seats'],
+            ]);
+            exit;
         }
 
         $flight = Flight::find($id);
@@ -136,6 +207,9 @@ class FlightController
 
         $data['available_seats'] = max(0, $data['total_seats'] - $reservedSeats);
         Flight::update($id, $data);
+        unset($_SESSION['flight_update_errors'], $_SESSION['flight_update_old']);
+        $GLOBALS['flight_update_errors'] = [];
+        $GLOBALS['flight_update_old_values'] = [];
         flash('ok', 'Vuelo actualizado correctamente.');
         redirect_to('ceo');
     }
