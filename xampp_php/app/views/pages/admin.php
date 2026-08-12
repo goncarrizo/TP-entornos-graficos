@@ -1,3 +1,7 @@
+<?php
+    $newsErrors = $_SESSION['create_news_errors'] ?? [];
+    $newsOldValues = $_SESSION['create_news_old'] ?? [];
+?>
 <section class="mb-4" aria-labelledby="admin-title">
   <h1 id="admin-title" class="h4">Panel Administrador</h1>
   <p class="text-muted">Gestion de aerolineas, promociones, novedades y reportes.</p>
@@ -315,8 +319,8 @@
             <input name="title" class="form-control mb-2" value="<?php echo htmlspecialchars($item['title']); ?>" required>
             <textarea name="content" class="form-control mb-2" rows="3" required><?php echo htmlspecialchars($item['content']); ?></textarea>
             <div class="row g-2 mb-2">
-              <div class="col-md-6"><label class="form-label" for="news_start_<?php echo (int) $item['id']; ?>">Fecha inicio</label><input id="news_start_<?php echo (int) $item['id']; ?>" name="start_date" type="date" class="form-control" value="<?php echo htmlspecialchars($item['start_date'] ?? ''); ?>"></div>
-              <div class="col-md-6"><label class="form-label" for="news_end_<?php echo (int) $item['id']; ?>">Fecha fin</label><input id="news_end_<?php echo (int) $item['id']; ?>" name="end_date" type="date" class="form-control" value="<?php echo htmlspecialchars($item['end_date'] ?? ''); ?>"></div>
+              <div class="col-md-6"><label class="form-label" for="news_start_<?php echo (int) $item['id']; ?>">Fecha inicio</label><input id="news_start_<?php echo (int) $item['id']; ?>" name="start_date" type="date" class="form-control" value="<?php echo htmlspecialchars($item['start_date'] ?? ''); ?>" required></div>
+              <div class="col-md-6"><label class="form-label" for="news_end_<?php echo (int) $item['id']; ?>">Fecha fin</label><input id="news_end_<?php echo (int) $item['id']; ?>" name="end_date" type="date" class="form-control" value="<?php echo htmlspecialchars($item['end_date'] ?? ''); ?>" required></div>
             </div>
             <div class="d-flex gap-2">
               <button class="btn btn-sm btn-warning" name="action" value="update_news" type="submit">Editar</button>

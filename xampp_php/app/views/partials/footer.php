@@ -82,6 +82,8 @@
     };
 
     Array.from(forms).forEach((form) => {
+      const allowServerValidation = form.dataset.allowServerValidation === '1';
+
       form.addEventListener('submit', (event) => {
         const passwordInput = form.querySelector('input[name="password"]');
         const passwordConfirmInput = form.querySelector('input[name="password_confirm"]');
@@ -94,7 +96,7 @@
           }
         }
 
-        if (!form.checkValidity()) {
+        if (!allowServerValidation && !form.checkValidity()) {
           event.preventDefault();
           event.stopPropagation();
         }

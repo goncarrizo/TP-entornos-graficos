@@ -34,17 +34,30 @@ class AdminController
         $pendingCEOs = User::getPendingCEOs();
 
         if ($newsErrors !== null) {
-            $_SESSION['news_errors'] = $newsErrors;
-            $_SESSION['news_old'] = $newsOld;
-            $GLOBALS['news_errors'] = $newsErrors;
-            $GLOBALS['news_old_values'] = $newsOld;
+            $_SESSION['create_news_errors'] = $newsErrors;
+            $_SESSION['create_news_old'] = $newsOld;
+            $GLOBALS['create_news_errors'] = $newsErrors;
+            $GLOBALS['create_news_old_values'] = $newsOld;
         } else {
-            $GLOBALS['news_errors'] = [];
-            $GLOBALS['news_old_values'] = [];
-            unset($_SESSION['news_errors'], $_SESSION['news_old']);
+            $newsErrors = $_SESSION['create_news_errors'] ?? [];
+            $newsOld = $_SESSION['create_news_old'] ?? [];
+            $GLOBALS['create_news_errors'] = $newsErrors;
+            $GLOBALS['create_news_old_values'] = $newsOld;
         }
 
-        view('admin', compact('airlines', 'promotions', 'news', 'reports', 'sales', 'pendingAirlineRequests', 'pendingFlightRequests', 'pendingCEOs'));
+        view('admin', [
+            'airlines' => $airlines,
+            'promotions' => $promotions,
+            'news' => $news,
+            'reports' => $reports,
+            'sales' => $sales,
+            'pendingAirlineRequests' => $pendingAirlineRequests,
+            'pendingFlightRequests' => $pendingFlightRequests,
+            'pendingCEOs' => $pendingCEOs,
+            'newsErrors' => $newsErrors,
+            'newsOld' => $newsOld,
+            'newsOldValues' => $newsOld,
+        ]);
     }
 
     public static function approveAirlineRequest(): void
@@ -184,6 +197,8 @@ class AdminController
         }
         if ($country === '') {
             $errors['country'] = 'Campo obligatorio.';
+        } elseif (preg_match('/\d/', $country)) {
+            $errors['country'] = 'El país no puede contener números.';
         }
 
         if (!empty($errors)) {
@@ -260,6 +275,8 @@ class AdminController
         }
         if ($country === '') {
             $errors['country'] = 'Campo obligatorio.';
+        } elseif (preg_match('/\d/', $country)) {
+            $errors['country'] = 'El país no puede contener números.';
         }
 
         if ($id < 1 || !empty($errors)) {
@@ -325,45 +342,35 @@ class AdminController
 
         $errors = [];
 
-        // =========================
-        // TÍTULO
-        // =========================
+        // Titulo
         if ($title === '') {
-            $errors['title'] = 'campo obligatorio';
+            $errors['title'] = 'El campo es obligatorio.';
         } elseif (!preg_match('/\p{L}/u', $title)) {
             $errors['title'] = 'Título inválido.';
         }
 
-        // =========================
-        // CONTENIDO
-        // =========================
+        // Contenido
         if ($content === '') {
-            $errors['content'] = 'campo obligatorio';
+            $errors['content'] = 'El campo es obligatorio.';
         } elseif (!preg_match('/\p{L}/u', $content)) {
             $errors['content'] = 'Contenido inválido.';
         }
 
-        // =========================
-        // FECHA DE INICIO
-        // =========================
+        // Fecha de inicio
         if ($startDate === '') {
-            $errors['start_date'] = 'campo obligatorio';
+            $errors['start_date'] = 'El campo es obligatorio.';
         } elseif (!valid_news_date($startDate)) {
             $errors['start_date'] = 'La fecha de inicio no es válida.';
         }
 
-        // =========================
-        // FECHA DE FIN
-        // =========================
+        // Fecha de fin
         if ($endDate === '') {
-            $errors['end_date'] = 'campo obligatorio';
+            $errors['end_date'] = 'El campo es obligatorio.';
         } elseif (!valid_news_date($endDate)) {
             $errors['end_date'] = 'La fecha de fin no es válida.';
         }
 
-        // =========================
-        // COMPARAR FECHAS
-        // =========================
+        // Validacion de fechas
         if (
             !isset($errors['start_date']) &&
             !isset($errors['end_date']) &&
@@ -372,10 +379,8 @@ class AdminController
             $errors['end_date'] = 'La fecha de fin no puede ser anterior a la fecha de inicio.';
         }
 
-        // =========================
-        // SI HAY ERRORES
-        // =========================
         if (!empty($errors)) {
+            flash('error', 'Revisa los campos marcados para continuar.');
             self::panel($errors, [
                 'title' => $title,
                 'content' => $content,
@@ -385,9 +390,7 @@ class AdminController
             exit;
         }
 
-        // =========================
-        // CREAR NOVEDAD
-        // =========================
+        //Crear novedad
         News::create(
             $title,
             $content,
@@ -396,11 +399,11 @@ class AdminController
         );
 
         unset(
-            $_SESSION['news_errors'],
-            $_SESSION['news_old']
+            $_SESSION['create_news_errors'],
+            $_SESSION['create_news_old']
         );
-        $GLOBALS['news_errors'] = [];
-        $GLOBALS['news_old_values'] = [];
+        $GLOBALS['create_news_errors'] = [];
+        $GLOBALS['create_news_old_values'] = [];
 
         flash('ok', 'Novedad publicada.');
 
@@ -416,8 +419,46 @@ class AdminController
         $startDate = trim((string) ($_POST['start_date'] ?? '')) ?: null;
         $endDate = trim((string) ($_POST['end_date'] ?? '')) ?: null;
 
-        if ($id < 1 || $title === '' || $content === '') {
-            flash('error', 'Datos invalidos para actualizar novedad.');
+        $errors = [];
+
+        if ($id < 1) {
+            $errors['id'] = 'Novedad inválida.';
+        }
+
+        if ($title === '') {
+            $errors['title'] = 'El campo es obligatorio.';
+        } elseif (!preg_match('/\p{L}/u', $title)) {
+            $errors['title'] = 'Título inválido.';
+        }
+
+        if ($content === '') {
+            $errors['content'] = 'El campo es obligatorio.';
+        } elseif (!preg_match('/\p{L}/u', $content)) {
+            $errors['content'] = 'Contenido inválido.';
+        }
+
+        if ($startDate === null || $startDate === '') {
+            $errors['start_date'] = 'El campo es obligatorio.';
+        } elseif (!valid_news_date($startDate)) {
+            $errors['start_date'] = 'La fecha de inicio no es válida.';
+        }
+
+        if ($endDate === null || $endDate === '') {
+            $errors['end_date'] = 'El campo es obligatorio.';
+        } elseif (!valid_news_date($endDate)) {
+            $errors['end_date'] = 'La fecha de fin no es válida.';
+        }
+
+        if (
+            !isset($errors['start_date']) &&
+            !isset($errors['end_date']) &&
+            $endDate < $startDate
+        ) {
+            $errors['end_date'] = 'La fecha de fin no puede ser anterior a la fecha de inicio.';
+        }
+
+        if (!empty($errors)) {
+            flash('error', 'Revisa los campos marcados para continuar.');
             redirect_to('admin');
         }
 
